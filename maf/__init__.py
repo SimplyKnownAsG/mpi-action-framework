@@ -7,4 +7,5 @@ __version__ = '0.1'
 
 from maf.shared import *
 from maf.actions import *
+from maf.controllers import *
 

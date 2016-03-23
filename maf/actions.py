@@ -118,34 +118,18 @@ class Action(object):
             result = [obj]
         return result
 
+    def supply_state(self, *args, **kwargs):
+        pass
+
     def invoke(self):
         '''
         This method is called by worker nodes, and passed the worker node's operator, reactor and
         settings file.
-
-        Returns
-        -------
-        result : object
-            result from invokeHook
         '''
-        return self.invokeHook()
+        raise NotImplementedError('Must subclass maf.Action.invoke before it can be used!')
 
-    def invokeHook(self):
-        '''This method must be overridden in sub-clases.
 
-        This method is called by worker nodes, and has access to the worker node's operator,
-        reactor, and settings (through :code:`self.`, :code:`self.`, and :code:`self.`).
-        It must return a boolean value of :code:`True` or :code:`False`, otherwise the worker node
-        will raise an exception and terminate execution.
+class EndLoopAction(Action, Exception):
 
-        Returns
-        -------
-        result : object
-            Dependent on implementation
-        '''
-        raise NotImplementedError()
-
-def scatter_actions(actions):
     pass
-
 
