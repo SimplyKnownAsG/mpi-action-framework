@@ -1,3 +1,7 @@
+# editor files
+*~
+.*.swp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -5,6 +9,7 @@ __pycache__/
 
 # C extensions
 *.so
+*.pyd
 
 # Distribution / packaging
 .Python
@@ -60,3 +65,4 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
