@@ -1,15 +1,23 @@
 # editor files
 *~
 .*.swp
+.vscode
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
+# SWIG files
+maf.py
+*_wrap*
+
+# Compiled files
 *.so
 *.pyd
+*.obj
+*.exp
+*.lib
 
 # Distribution / packaging
 .Python
