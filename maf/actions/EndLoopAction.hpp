@@ -10,7 +10,9 @@ namespace maf {
     public:
         EndLoopAction() : Exception("ending the loop") { };
 
-        void invoke();
+        void run() override;
+
+        std::string type_name() { return "EndLoopAction"; }
     };
 
 }

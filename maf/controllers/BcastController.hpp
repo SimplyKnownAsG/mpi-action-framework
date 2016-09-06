@@ -2,11 +2,11 @@
 
 namespace maf {
 
-    class BcastController : Controller {
+    class BcastController : public Controller {
 
     public:
-   
-        virtual Action *get_action();
+
+        Action* distribute(Action* action=NULL);
 
     };
 

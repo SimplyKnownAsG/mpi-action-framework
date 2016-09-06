@@ -4,10 +4,11 @@
 
 namespace maf {
 
-class Version {
-    const static std::string git_sha1;
+    class Version {
+    public:
+        static const std::string git_sha1;
 
-    const static std::string git_description;
-};
+        static const std::string git_description;
+    };
 
 }

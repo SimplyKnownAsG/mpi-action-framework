@@ -6,10 +6,7 @@
 %feature("autodoc", "2");
 
 %{
-#include "maf/macros.hpp"
-#include "maf/example.hpp"
-#include "maf/exceptions/Exception.hpp"
-#include "maf/actions/Action.hpp"
+#include "maf/maf.hpp"
 %}
 
 namespace std {
@@ -17,10 +14,7 @@ namespace std {
 }
 
 %feature("director") Thing;
-%include "maf/macros.hpp"
-%include "maf/example.hpp"
-%include "maf/exceptions/Exception.hpp"
-%include "maf/actions/Action.hpp"
+%include "maf/maf.hpp"
 
 %exception {
     try {
@@ -38,7 +32,7 @@ namespace std {
 };
 
 
-%pythoncode {
+%pythoncode %{
 
 class Thing(_maf.Thing):
     def __getstate__(self):
@@ -47,6 +41,15 @@ class Thing(_maf.Thing):
         self.__init__(state['name'])
         self.index = state['index']
 
-}
+# thank you internet...
+# http://stackoverflow.com/questions/34445045/passing-python-functions-to-swig-wrapped-c-code
+def register(klass):
+    import ctypes
+    def callback():
+        instance = klass.__new__()
+        return instance.this
+    c_func = ctypes.CFUNCTYPE(None)(callback)
+    func_pointer = ctypes.cast(c_func, ctypes.c_void_p)
+    Action.Register(klass.__name__, func_pointer)
 
-
+%}
