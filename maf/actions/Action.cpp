@@ -10,8 +10,6 @@ namespace maf {
         {"EndLoopAction", &create_action<EndLoopAction> }
     };
 
-    std::unordered_map<std::string, void (*)(Action*)> Action::update_functions;
-
     void Action::Register(std::string name, Action*(*create_func)()) {
         try {
             auto func = Action::registerd_actions.at(name);
@@ -25,16 +23,15 @@ namespace maf {
         }
     };
 
-    void Action::Register(std::string name, void (*update_func)(Action*)) {
+    Action* Action::Create(std::string name) {
         try {
-            auto func = Action::update_functions.at(name);
-            std::ostringstream msg;
-            msg << "Update function with the name `" << name << "` has already been registered.";
-            throw new Exception(msg.str());
+            auto func = Action::registerd_actions.at(name);
+            return func();
         }
         catch (std::out_of_range& ex) {
-            // success
-            Action::update_functions[name] = update_func;
+            std::ostringstream msg;
+            msg << "No action with the name `" << name << "` has been registered.";
+            throw new Exception(msg.str());
         }
     };
 
@@ -49,11 +46,5 @@ namespace maf {
     Action::Action() {
         this->transmitted = false;
     }
-
-    void Action::invoke() {
-        this->set_up();
-        this->run();
-        this->tear_down();
-    };
 
 }

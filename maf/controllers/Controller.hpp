@@ -5,16 +5,13 @@
 namespace maf {
 
     class Controller {
-
     public:
-
-        virtual Action *get_action() = 0;
 
         void start();
 
-        virtual void stop_workers() = 0;
+        virtual void main() = 0;
 
-        void start_workers();
+        virtual Action* distribute(Action* action=NULL) = 0;
 
     };
 

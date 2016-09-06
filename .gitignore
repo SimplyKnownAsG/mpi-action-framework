@@ -9,9 +9,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# SWIG files
+# Generated files
 maf.py
 *_wrap*
+maf/maf.hpp
+maf/Version.cpp
 
 # Compiled files
 *.so
@@ -19,6 +21,7 @@ maf.py
 *.obj
 *.exp
 *.lib
+*.exe
 
 # Distribution / packaging
 .Python

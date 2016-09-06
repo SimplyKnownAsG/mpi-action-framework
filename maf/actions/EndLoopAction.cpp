@@ -2,7 +2,7 @@
 
 namespace maf {
 
-    void EndLoopAction::invoke() {
+    void EndLoopAction::run() {
         throw this;
     }
 

@@ -1,39 +1,42 @@
 
 ifeq ($(OS),Windows_NT)
-	COMPILER=cl
-	LINKER=link
-	CCFLAGS += -D WIN32
-	COMPILER_FLAGS= /nologo /fp:strict /MP "/IC:\Program Files\Microsoft HPC Pack 2012\Inc" "/IC:\Python27\include" /I.-c $< /Fo:$@
-	LINK_FLAGS= /DLL /out:$(PY_EXT) /nologo /incremental:no '/libpath:C:\Python27\libs' '/libpath:C:\Program Files\Microsoft HPC Pack 2012\Lib\amd64' msmpi.lib
+	CXX=cl
+	LD=link
+	CXXFLAGS= /nologo /EHsc /fp:strict /MP "/IC:\Program Files\Microsoft HPC Pack 2012\Inc" "/IC:\Python27\include" /I. /c $< /Fo:$@
+	LDFLAGS= /nologo /incremental:no '/libpath:C:\Python27\libs' '/libpath:C:\Program Files\Microsoft HPC Pack 2012\Lib\amd64' msmpi.lib
+	LDSHARED= /DLL /out:$@
+	LDEXE= /out:$@
 	PY_EXT=_maf.pyd
 else
-	COMPILER=mpic++
-	LINKER=mpic++
-	COMPILER_FLAGS= -fPIC -std=c++1y -c $< -o $@ -I/usr/include/python2.7
-	LINK_FLAGS= -fPIC -shared -o $(PY_EXT)
+	CXX=mpic++
+	LD=mpic++
+	CXXFLAGS= -fPIC -std=c++1y -c $< -o $@ -I/usr/include/python2.7
+	LDFLAGS= -fPIC
+	LDSHARED= -shared -o $@
+	LDEXE= -o $@
 	PY_EXT=_maf.so
 endif
 
-# for standard compiler settings
+ifeq ($(MAKECMDGOALS),debug)
+	BUILD_DIR=debug
+	CXXFLAGS+= /debug:all /check:all /check:noarg_temp_created
+	LDFLAGS+= /debug
+else
+	CXXFLAGS+= -O2
+	BUILD_DIR=release
+endif
+
+# for standard CXX settings
 SRC_DIR=maf
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 
-SRC = $(call rwildcard, $(SRC_DIR), *.cpp) $(SRC_DIR)/maf_wrap.cpp
-HEADERS = $(filter-out %maf_wrap.hpp, $(call rwildcard, $(SRC_DIR), *.hpp))
+SRC = $(call rwildcard, $(SRC_DIR), *.cpp) $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/Version.cpp
+HEADERS = $(filter-out %maf_wrap.hpp maf/maf.hpp, $(call rwildcard, $(SRC_DIR), *.hpp))
+DIRECTORIES = $(sort $(dir $(SRC) $(HEADERS)))
 OBJ = $(patsubst %.cpp,$(BUILD_DIR)/%.obj,$(SRC))
 
-ifeq ($(MAKECMDGOALS),debug)
-BUILD_DIR=debug
-COMPILER_FLAGS+= /debug:all /check:all /check:noarg_temp_created
-LINK_FLAGS+= /debug
-else
-COMPILER_FLAGS+= -O2
-BUILD_DIR=release
-endif
-
-
-.PHONY: version.cpp test
+.PHONY: test
 
 all: release test
 
@@ -42,31 +45,48 @@ release: $(PY_EXT)
 debug: $(PY_EXT)
 
 clean:
-	-rm -rf ./debug/ ./release/ $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp
+	-$(RM) -rf ./debug/ ./release/
+	-$(RM) $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp _maf.* maf/Version.cpp tests/test_cpp.exe
 
 tags: $(SRC)
 	ctags $(SRC)
 
-$(exe): $(OBJ) 
-	$(LD) $(OBJ) -o $(exe)  $(LDFLAGS)
+maf/maf.hpp: $(HEADERS)
+	@echo "// this file is auto-generated, do not modify" > $@
+	@$(foreach hpp,$^,echo '#include "$(hpp)"' >> $@;)
+	@echo "" >> $@
 
-version.cpp:
-	@echo '#include "version.hpp"' > version.cpp
-	@echo '' >> version.cpp
-	@echo 'std::string Version::git_sha1 = "`git rev-parse HEAD`"' >> version.cpp
-	@echo '' >> version.cpp
-	@echo 'std::string Version::git_description = "`git describe --always --dirty`"' >> version.cpp
-	@echo "" >> version.cpp
+maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC))
+	@echo '#include "maf/Version.hpp"' > $@
+	@echo '' >> $@
+	@echo 'namespace maf {' >> $@
+	@echo 'const std::string Version::git_sha1 = "'`git rev-parse HEAD`'";' >> $@
+	@echo '' >> $@
+	@echo 'const std::string Version::git_description = "'`git describe --always --dirty`'";' >> $@
+	@echo '}' >> $@
+	@echo "" >> $@
 
-test: $(PY_EXT)
+test: test_py test_cpp
+
+test_py: $(PY_EXT)
 	PYTHONPATH=. mpiexec -n 2 python tests/test.py
+
+test_cpp: tests/test_cpp.exe
+	mpiexec -n 4 $<
+
+tests/test_cpp.exe: $(patsubst %.cpp,$(BUILD_DIR)/%.obj, $(call rwildcard, tests/, *.cpp)) $(OBJ) maf/maf.hpp
+	$(LD) $(LDFLAGS) $(filter-out maf/maf.hpp,$^) $(LDEXE)
 
 $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: $(HEADERS) maf.i
 	swig -python -builtin -includeall -ignoremissing -c++ -outdir . -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i
 
 $(BUILD_DIR)/%.obj: %.cpp %.hpp
 	@-if [ ! -d "$(@D)" ]; then python -c 'import os; os.makedirs("$(@D)")' ; fi
-	$(COMPILER) $(COMPILER_FLAGS) -I./$(BUILD_DIR)/ -I.
+	$(CXX) $(CXXFLAGS) -I.
+
+$(BUILD_DIR)/%.obj: %.cpp
+	@-if [ ! -d "$(@D)" ]; then python -c 'import os; os.makedirs("$(@D)")' ; fi
+	$(CXX) $(CXXFLAGS) -I.
 
 $(PY_EXT): $(OBJ)
-	$(LINKER) $(OBJ) $(LINK_FLAGS) 
+	$(LD) $(LDSHARED) $^ $(LDFLAGS)
