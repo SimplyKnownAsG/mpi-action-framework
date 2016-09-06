@@ -2,6 +2,7 @@
 
 %include "std_string.i"
 %include "exception.i"
+%include "std_vector.i"
 %feature("autodoc", "2");
 
 %{
@@ -10,6 +11,10 @@
 #include "maf/exceptions/Exception.hpp"
 #include "maf/actions/Action.hpp"
 %}
+
+namespace std {
+    %template(StringVector) vector<string>;
+}
 
 %feature("director") Thing;
 %include "maf/macros.hpp"

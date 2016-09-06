@@ -1,1 +1,7 @@
+--style=attach
 --indent-namespaces
+--break-closing-brackets
+--add-brackets
+--convert-tabs
+--align-pointer=type
+--close-templates

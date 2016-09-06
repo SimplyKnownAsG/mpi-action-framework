@@ -36,6 +36,14 @@ if i.double == 0.0:
 else:
     mpi_print('FAILED')
 
+assert 'EndLoopAction' in maf.Action.RegisteredNames(), 'EndLoopAction is not registered!!'
+
+class WhatAction(maf.Action):
+
+    def invoke(self):
+        mpi_print('Inside a WhatAction biatches!')
+
+maf.Action.Register('WhatAction', WhatAction.__init__)
 
 class ActionTests(unittest.TestCase):
     
