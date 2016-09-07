@@ -72,7 +72,7 @@ test_py: $(PY_EXT)
 	PYTHONPATH=. mpiexec -n 2 python tests/test.py
 
 test_cpp: tests/test_cpp.exe
-	mpiexec -n 2 $<
+	mpiexec -n 4 $<
 
 tests/test_cpp.exe: $(patsubst %.cpp,$(BUILD_DIR)/%.obj, $(call rwildcard, tests/, *.cpp)) $(OBJ) maf/maf.hpp
 	$(LD) $(LDFLAGS) $(filter-out maf/maf.hpp,$^) $(LDEXE)
