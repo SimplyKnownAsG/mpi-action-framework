@@ -54,7 +54,7 @@ namespace maf {
         return;
     }
 
-    void Action::serialize(Archive* archive) {
+    void Action::serialize(std::shared_ptr<Archive> archive) {
         return;
     }
 

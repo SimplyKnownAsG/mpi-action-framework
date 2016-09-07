@@ -9,30 +9,20 @@ namespace maf {
 
     std::shared_ptr<Action> BcastController::distribute(std::shared_ptr<Action> action) {
         if (action) {
-            auto archive = new WriteArchive;
+            std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new WriteArchive);
             std::string type_name = action->type_name();
             (*archive) & type_name;
-            try {
-                action->serialize(archive);
-            }
-            catch (...) {
-                mpi_print("couldn't serialize, but whatever");
-            }
+            action->serialize(archive);
             archive->bcast();
             return action;
         }
         else {
-            auto archive = new ReadArchive;
+            std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new ReadArchive);
             archive->bcast();
             std::string type_name;
             (*archive) & type_name;
-            auto result = Action::Create(type_name);
-            try {
-                result->serialize(archive);
-            }
-            catch (...) {
-                mpi_print("couldn't serialize, but whatever");
-            }
+            std::shared_ptr<Action> result = Action::Create(type_name);
+            result->serialize(archive);
             return result;
         }
     };

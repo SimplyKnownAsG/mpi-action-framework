@@ -35,15 +35,22 @@ namespace std {
 
 %feature("director") Thing;
 %feature("director") maf::Action;
+%shared_ptr(maf::Action);
+%shared_ptr(maf::EndLoopAction);
 %feature("director") maf::ActionFactory;
 %shared_ptr(maf::ActionFactory);
 %feature("director") maf::Controller;
 %feature("director") maf::BcastController;
+%shared_ptr(maf::Archive);
+%shared_ptr(maf::ReadArchive);
+%shared_ptr(maf::WriteArchive);
 
 %include "maf/maf.hpp"
 
 
 %pythoncode %{
+
+_FACTORY_REFRENCES = []
 
 # thank you internet...
 # http://stackoverflow.com/questions/34445045/passing-python-functions-to-swig-wrapped-c-code
@@ -56,12 +63,19 @@ def register(klass):
     # func_pointer = ctypes.cast(c_func, ctypes.c_void_p)
     # Action.Register(klass.__name__, func_pointer)
     class PyActionFactory(ActionFactory):
+
+        _ACTIONS = []
         
         def create_action(self):
-            mpi_print('calling PyActionFactory for {}'.format(klass))
-            return klass()
+            maf_print('calling PyActionFactory for {}'.format(klass))
+            PyActionFactory._ACTIONS.append(klass())
+            return PyActionFactory._ACTIONS[-1]
+        
+        def __del__(self):
+            maf_print('PyActionFactory.__del__')
     
     factory = PyActionFactory(klass.__name__)
     Action.Register(factory)
+    _FACTORY_REFRENCES.append(factory)
 
 %}

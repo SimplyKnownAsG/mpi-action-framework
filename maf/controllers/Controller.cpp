@@ -2,7 +2,6 @@
 #include "maf/controllers/Controller.hpp"
 #include "maf/actions/EndLoopAction.hpp"
 #include <mpi.h>
-#include "maf/example.hpp"
 
 namespace maf {
 
@@ -14,7 +13,7 @@ namespace maf {
                 this->main();
                 auto act = Action::Create("EndLoopAction");
                 this->distribute(act);
-                act->run(); // strangely deleted below
+                act->run();
             }
             else {
                 while (true) {
@@ -25,15 +24,6 @@ namespace maf {
         }
         catch (std::shared_ptr<Action> action) {
             // success
-        }
-        catch (std::exception &ex) {
-            mpi_print("FAILED: &", ex.what());
-        }
-        catch (std::exception *ex) {
-            mpi_print("FAILED: *", ex->what());
-        }
-        catch (...) {
-            mpi_print("FAILED: something \"bad\" happened");
         }
     }
 

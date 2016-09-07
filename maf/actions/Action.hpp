@@ -2,7 +2,6 @@
 
 #include "maf/macros.hpp"
 #include "maf/archives/Archive.hpp"
-#include "maf/example.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -36,7 +35,7 @@ namespace maf {
 
         virtual std::string type_name() = 0;
 
-        virtual void serialize(Archive* archive);
+        virtual void serialize(std::shared_ptr<Archive> archive);
     };
 
 }
