@@ -3,15 +3,20 @@
 
 #include <mpi.h>
 
-class HelloWorld : public maf::Action {
+class HelloWorldAction : public maf::Action {
 
 public:
+
+    HelloWorldAction() : maf::Action() {
+
+    };
+
     void run() {
-        maf::mpi_print("Hello World!");
+        maf::mpi_print("Hello World! (from c++)");
     };
 
     std::string type_name() {
-        return "HelloWorld";
+        return "HelloWorldAction";
     }
 
 };
@@ -19,20 +24,29 @@ public:
 class TestBcastController : public maf::BcastController {
 public:
     void main() {
-        maf::Action* act = new HelloWorld;
+        std::shared_ptr<maf::Action> act = std::shared_ptr<maf::Action>(new HelloWorldAction);
         this->distribute(act);
         act->run();
-        delete act;
     };
 };
 
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
 
-    maf::Action::Register("HelloWorld", &maf::create_action<HelloWorld>);
+    try {
+        // std::shared_ptr<ActionFactory> factory((ActionFactory*)(new TActionFactory<HelloWorldAction>("HelloWorldAction")));
+        auto factory = std::shared_ptr<maf::ActionFactory>((maf::ActionFactory*)(new maf::TActionFactory<HelloWorldAction>("HelloWorldAction")));
+        maf::Action::Register(factory);
 
-    TestBcastController controller;
-    controller.start();
+        TestBcastController controller;
+        controller.start();
+    }
+    catch (std::exception* ex) {
+        maf::mpi_print("FAILED: ", ex->what());
+    }
+    catch (...) {
+        maf::mpi_print("FAILED: no idea what happened");
+    }
 
     MPI_Finalize();
 }

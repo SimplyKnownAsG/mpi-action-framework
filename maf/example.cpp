@@ -3,12 +3,17 @@
 
 namespace maf {
 
-    int Thing::count = 0;
+    int _rank = -100;
 
-    void mpi_print(std::string msg) {
-        int rank;
-        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-        std::cout << "[" << rank << "] " << msg << std::endl;
+    int _get_rank() {
+        if (_rank < 0) {
+            MPI_Comm_rank(MPI_COMM_WORLD, &_rank);
+        }
+        return _rank;
+    }
+
+    void maf_print(std::string msg) {
+        mpi_print(msg);
     }
 
 }

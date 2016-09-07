@@ -11,7 +11,7 @@ namespace maf {
 
         virtual void main() = 0;
 
-        virtual Action* distribute(Action* action=NULL) = 0;
+        virtual std::shared_ptr<Action> distribute(std::shared_ptr<Action> action=NULL) = 0;
 
     };
 

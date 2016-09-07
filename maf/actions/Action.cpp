@@ -3,14 +3,16 @@
 #include "maf/actions/Action.hpp"
 #include "maf/actions/EndLoopAction.hpp"
 #include "maf/exceptions/Exception.hpp"
+#include "maf/actions/ActionFactory.hpp"
 
 namespace maf {
 
-    std::unordered_map<std::string, Action*(*)()> Action::registerd_actions {
-        {"EndLoopAction", &create_action<EndLoopAction> }
+    std::unordered_map<std::string, std::shared_ptr<ActionFactory>> Action::registerd_actions {
+        {"EndLoopAction", std::shared_ptr<ActionFactory>((ActionFactory*)(new TActionFactory<EndLoopAction>("EndLoopAction")))}
     };
 
-    void Action::Register(std::string name, Action*(*create_func)()) {
+    void Action::Register(std::shared_ptr<ActionFactory> factory) {
+        auto name = factory->action_name;
         try {
             auto func = Action::registerd_actions.at(name);
             std::ostringstream msg;
@@ -19,16 +21,17 @@ namespace maf {
         }
         catch (std::out_of_range& ex) {
             // success
-            Action::registerd_actions[name] = create_func;
+            Action::registerd_actions[name] = factory;
         }
     };
 
-    Action* Action::Create(std::string name) {
+    std::shared_ptr<Action> Action::Create(std::string name) {
         try {
-            auto func = Action::registerd_actions.at(name);
-            return func();
+            auto factory = Action::registerd_actions.at(name);
+            auto result = factory->create_action();
+            return result;
         }
-        catch (std::out_of_range& ex) {
+        catch (std::out_of_range* ex) {
             std::ostringstream msg;
             msg << "No action with the name `" << name << "` has been registered.";
             throw new Exception(msg.str());
@@ -45,6 +48,14 @@ namespace maf {
 
     Action::Action() {
         this->transmitted = false;
+    }
+
+    void Action::run() {
+        return;
+    }
+
+    void Action::serialize(Archive* archive) {
+        return;
     }
 
 }

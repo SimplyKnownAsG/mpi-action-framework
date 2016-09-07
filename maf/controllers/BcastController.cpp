@@ -3,27 +3,38 @@
 #include "maf/controllers/BcastController.hpp"
 #include "maf/archives/ReadArchive.hpp"
 #include "maf/archives/WriteArchive.hpp"
+#include "maf/example.hpp"
 
 namespace maf {
 
-    Action* BcastController::distribute(Action* act) {
-        Archive* archive = NULL;
-        std::string type_name;
-        if (act) {
-            archive = new WriteArchive();
-            type_name = act->type_name();
+    std::shared_ptr<Action> BcastController::distribute(std::shared_ptr<Action> action) {
+        if (action) {
+            auto archive = new WriteArchive;
+            std::string type_name = action->type_name();
             (*archive) & type_name;
-            act->serialize(archive);
+            try {
+                action->serialize(archive);
+            }
+            catch (...) {
+                mpi_print("couldn't serialize, but whatever");
+            }
             archive->bcast();
+            return action;
         }
         else {
-            archive = new ReadArchive();
+            auto archive = new ReadArchive;
             archive->bcast();
+            std::string type_name;
             (*archive) & type_name;
-            act = Action::Create(type_name);
-            act->serialize(archive);
+            auto result = Action::Create(type_name);
+            try {
+                result->serialize(archive);
+            }
+            catch (...) {
+                mpi_print("couldn't serialize, but whatever");
+            }
+            return result;
         }
-        return act;
     };
 
 }
