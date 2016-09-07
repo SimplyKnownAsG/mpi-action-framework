@@ -19,8 +19,8 @@ endif
 
 ifeq ($(MAKECMDGOALS),debug)
 	BUILD_DIR=debug
-	CXXFLAGS+= /debug:all /check:all /check:noarg_temp_created
-	LDFLAGS+= /debug
+	CXXFLAGS+= /Zi
+	LDFLAGS+= /debug /LDd
 else
 	CXXFLAGS+= -O2
 	BUILD_DIR=release
@@ -38,11 +38,11 @@ OBJ = $(patsubst %.cpp,$(BUILD_DIR)/%.obj,$(SRC))
 
 .PHONY: test
 
-all: release test
+all: release
 
-release: $(PY_EXT)
+release: test
 
-debug: $(PY_EXT)
+debug: test
 
 clean:
 	-$(RM) -rf ./debug/ ./release/
@@ -66,18 +66,18 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 	@echo '}' >> $@
 	@echo "" >> $@
 
-test: test_py test_cpp
+test: test_cpp test_py
 
 test_py: $(PY_EXT)
 	PYTHONPATH=. mpiexec -n 2 python tests/test.py
 
 test_cpp: tests/test_cpp.exe
-	mpiexec -n 4 $<
+	mpiexec -n 2 $<
 
 tests/test_cpp.exe: $(patsubst %.cpp,$(BUILD_DIR)/%.obj, $(call rwildcard, tests/, *.cpp)) $(OBJ) maf/maf.hpp
 	$(LD) $(LDFLAGS) $(filter-out maf/maf.hpp,$^) $(LDEXE)
 
-$(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: $(HEADERS) maf.i
+$(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: $(HEADERS) maf.i maf/maf.hpp
 	swig -python -builtin -includeall -ignoremissing -c++ -outdir . -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i
 
 $(BUILD_DIR)/%.obj: %.cpp %.hpp

@@ -1,39 +1,42 @@
 #pragma once
 
-#include <unordered_map>
-#include <vector>
-
 #include "maf/macros.hpp"
 #include "maf/archives/Archive.hpp"
+#include "maf/example.hpp"
+
+#include <unordered_map>
+#include <memory>
 
 namespace maf {
+
+    // forward declaration
+    class ActionFactory;
 
     class Action {
 
     private:
         bool transmitted;
 
-        static std::unordered_map<std::string, Action*(*)()> registerd_actions;
+        static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> registerd_actions;
 
     public:
 
-        static void Register(std::string name, Action*(*create_func)());
+        static void Register(std::shared_ptr<ActionFactory> factory);
 
-        static Action * Create(std::string name);
+        static std::shared_ptr<Action> Create(std::string name);
 
         static std::vector<std::string> RegisteredNames();
 
         Action();
 
-        virtual void run() { return; };
+        virtual ~Action() {
+        };
+
+        virtual void run();
 
         virtual std::string type_name() = 0;
 
-        virtual void serialize(Archive *archive) { return; };
-    };
-
-    template <class T> Action* create_action() {
-        return new T;
+        virtual void serialize(Archive* archive);
     };
 
 }

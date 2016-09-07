@@ -11,39 +11,27 @@
 #include "maf/archives/ReadArchive.hpp"
 
 namespace maf {
-    void mpi_print(std::string msg);
 
-    class Thing
-    {
-    private:
-        static int count;
-    public:
-        int index;
-        std::string name;
-        Thing(std::string name) : name(name)
-        {
-            this->index = count++;
-        };
+    int _get_rank();
 
-        virtual void serialize(Archive *serializer) {
-            return;
-        };
-
-        void bcast(int root=0) {
-            int rank;
-            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-            Archive *serializer = NULL;
-            if (rank == root) {
-                serializer = new WriteArchive();
-                this->serialize(serializer);
-                serializer->bcast();
-            }
-            else {
-                serializer = new ReadArchive();
-                serializer->bcast();
-                this->serialize(serializer);
-            }
-            delete serializer;
-        };
+    template<typename T1>
+    void flatten(std::ostream& stream, T1 arg1) {
+        stream << arg1;
     };
+
+    template<typename T1, typename... TArgs>
+    void flatten(std::ostream& stream, T1 arg1, TArgs... args) {
+        stream << arg1;
+        flatten(stream, args...);
+    };
+
+    template<typename... TArgs>
+    void mpi_print(TArgs... args) {
+        std::ostringstream msg;
+        flatten(msg, args...);
+        std::cout << "[" << _get_rank() << "] " << msg.str() << std::endl;
+    };
+
+    void maf_print(std::string msg);
+
 }
