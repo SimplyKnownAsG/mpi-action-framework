@@ -5,7 +5,9 @@ ifeq ($(OS),Windows_NT)
 	CXXFLAGS= /nologo /EHsc /fp:strict /MP "/IC:\Program Files\Microsoft HPC Pack 2012\Inc" "/IC:\Python27\include" /I. /c $< /Fo:$@
 	LDFLAGS= /nologo /incremental:no '/libpath:C:\Python27\libs' '/libpath:C:\Program Files\Microsoft HPC Pack 2012\Lib\amd64' msmpi.lib
 	LDSHARED= /DLL /out:$@
+	LDSTATIC= /lib /out:$@
 	LDEXE= /out:$@
+	LIBMAF=libmaf.lib
 	PY_EXT=_maf.pyd
 else
 	CXX=mpic++
@@ -13,7 +15,9 @@ else
 	CXXFLAGS= -fPIC -std=c++1y -c $< -o $@ -I/usr/include/python2.7
 	LDFLAGS= -fPIC
 	LDSHARED= -shared -o $@
+	LDSHARED= -static -o $@
 	LDEXE= -o $@
+	LIBMAF=libmaf.a
 	PY_EXT=_maf.so
 endif
 
@@ -39,7 +43,7 @@ define colorecho
 
 endef
 
-SRC = $(call rwildcard, $(SRC_DIR), *.cpp) $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/Version.cpp
+SRC = $(filter-out %maf_wrap.pp,$(call rwildcard, $(SRC_DIR), *.cpp)) $(SRC_DIR)/Version.cpp
 HEADERS = $(filter-out %maf_wrap.hpp maf/maf.hpp, $(call rwildcard, $(SRC_DIR), *.hpp))
 DIRECTORIES = $(sort $(dir $(SRC) $(HEADERS)))
 OBJ = $(patsubst %.cpp,$(BUILD_DIR)/%.obj,$(SRC))
@@ -80,14 +84,18 @@ test_py: PY_TEST_FILES=$(sort $(call rwildcard, tests/, *.py))
 test_py: $(PY_EXT)
 	$(foreach pytestfile, $(PY_TEST_FILES), $(call colorecho,PYTHONPATH=. mpiexec -n 2 python $(pytestfile)))
 
-$(PY_EXT): $(OBJ)
+$(LIBMAF): $(OBJ)
+	@-if [ ! -d "$(@D)" ]; then python -c 'import os; os.makedirs("$(@D)")' ; fi
+	$(call colorecho,$(LD) $(LDSTATIC) $^ $(LDFLAGS))
+
+$(PY_EXT): $(BUILD_DIR)/maf/maf_wrap.obj $(LIBMAF)
 	$(call colorecho,$(LD) $(LDSHARED) $^ $(LDFLAGS))
 
 test_cpp: $(sort $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp)))
 	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 2 $(cpp_test_exec)))
 
-tests/%.exe: maf/maf.hpp $(BUILD_DIR)/tests/%.obj $(OBJ)
-	$(call colorecho,$(LD) $(LDFLAGS) $(filter-out %wrap.obj maf/maf.hpp,$^) $(LDEXE))
+tests/%.exe: maf/maf.hpp $(BUILD_DIR)/tests/%.obj $(LIBMAF)
+	$(call colorecho,$(LD) $(LDFLAGS) $(filter-out maf/maf.hpp,$^) $(LDEXE))
 
 $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: maf.i maf/maf.hpp
 	$(call colorecho,swig -python -builtin -includeall -ignoremissing -c++ -outdir . -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i)
