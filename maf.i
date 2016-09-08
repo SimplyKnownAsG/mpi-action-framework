@@ -58,6 +58,9 @@ class Action(_maf.Action):
 
     def tear_down(self):
         _ACTION_STACK.pop()
+    
+    def type_name(self):
+        return self.__class__.__name__
 
 # thank you internet...
 # http://stackoverflow.com/questions/34445045/passing-python-functions-to-swig-wrapped-c-code

@@ -24,7 +24,7 @@ namespace maf {
 	float method(float &val) body; \
 	double method(double &val) body;
 
-#define SERIALIZE_BODY() \
+#define RW_BODY() \
     (*this)& val; \
     return val;
 
@@ -39,20 +39,24 @@ namespace maf {
 
         // CREATE_OPERATOR_AMP_VECTOR(= 0);
 
-        int serialize_int(int val) {
-            SERIALIZE_BODY()
+        int rw_int(int val) {
+            RW_BODY()
         };
 
-        long long serialize_long_long(long long val) {
-            SERIALIZE_BODY()
+        long long rw_long_long(long long val) {
+            RW_BODY()
         };
 
-        float serialize_float(float val) {
-            SERIALIZE_BODY()
+        float rw_float(float val) {
+            RW_BODY()
         };
 
-        double serialize_double(double val) {
-            SERIALIZE_BODY()
+        double rw_double(double val) {
+            RW_BODY()
+        };
+
+        std::string rw_string(std::string val) {
+            RW_BODY()
         };
 
         virtual void bcast(int root=0) = 0;
