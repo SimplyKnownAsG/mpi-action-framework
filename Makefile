@@ -73,19 +73,22 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 	@echo '}' >> $@
 	@echo "" >> $@
 
-test: test_cpp test_py
+test: test_py test_cpp
 
-test_py: PYTESTFILES=$(call rwildcard, tests/, *.py)
+test_py: PY_TEST_FILES=$(call rwildcard, tests/, *.py)
 test_py: $(PY_EXT)
-	$(foreach pytestfile, $(PYTESTFILES), $(call colorecho,PYTHONPATH=. mpiexec -n 2 python $(pytestfile)))
+	$(foreach pytestfile, $(PY_TEST_FILES), $(call colorecho,PYTHONPATH=. mpiexec -n 2 python $(pytestfile)))
 
-test_cpp: tests/test_cpp.exe
-	$(call colorecho,mpiexec -n 4 $<)
+$(PY_EXT): $(OBJ)
+	$(call colorecho,$(LD) $(LDSHARED) $^ $(LDFLAGS))
 
-tests/test_cpp.exe: maf/maf.hpp $(patsubst %.cpp,$(BUILD_DIR)/%.obj, $(call rwildcard, tests/, *.cpp)) $(OBJ)
+test_cpp: $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp))
+	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 2 $(cpp_test_exec)))
+
+tests/%.exe: maf/maf.hpp $(BUILD_DIR)/tests/%.obj $(OBJ)
 	$(call colorecho,$(LD) $(LDFLAGS) $(filter-out %wrap.obj maf/maf.hpp,$^) $(LDEXE))
 
-$(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: $(HEADERS) maf.i maf/maf.hpp
+$(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: maf.i maf/maf.hpp
 	$(call colorecho,swig -python -builtin -includeall -ignoremissing -c++ -outdir . -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i)
 
 $(BUILD_DIR)/%.obj: %.cpp %.hpp
@@ -95,6 +98,3 @@ $(BUILD_DIR)/%.obj: %.cpp %.hpp
 $(BUILD_DIR)/%.obj: %.cpp
 	@-if [ ! -d "$(@D)" ]; then python -c 'import os; os.makedirs("$(@D)")' ; fi
 	$(call colorecho,$(CXX) $(CXXFLAGS) -I.)
-
-$(PY_EXT): $(OBJ)
-	$(call colorecho,$(LD) $(LDSHARED) $^ $(LDFLAGS))
