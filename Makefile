@@ -29,7 +29,14 @@ endif
 # for standard CXX settings
 SRC_DIR=maf
 
+# functions
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
+define colorecho
+	@tput setaf 4
+	@echo $1
+	@tput sgr0
+	@$1
+endef
 
 SRC = $(call rwildcard, $(SRC_DIR), *.cpp) $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/Version.cpp
 HEADERS = $(filter-out %maf_wrap.hpp maf/maf.hpp, $(call rwildcard, $(SRC_DIR), *.hpp))
@@ -69,24 +76,24 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 test: test_cpp test_py
 
 test_py: $(PY_EXT)
-	PYTHONPATH=. mpiexec -n 2 python tests/test.py
+	$(call colorecho,PYTHONPATH=. mpiexec -n 2 python tests/test.py)
 
 test_cpp: tests/test_cpp.exe
-	mpiexec -n 4 $<
+	$(call colorecho,mpiexec -n 4 $<)
 
-tests/test_cpp.exe: $(patsubst %.cpp,$(BUILD_DIR)/%.obj, $(call rwildcard, tests/, *.cpp)) $(OBJ) maf/maf.hpp
-	$(LD) $(LDFLAGS) $(filter-out maf/maf.hpp,$^) $(LDEXE)
+tests/test_cpp.exe: maf/maf.hpp $(patsubst %.cpp,$(BUILD_DIR)/%.obj, $(call rwildcard, tests/, *.cpp)) $(OBJ)
+	$(call colorecho,$(LD) $(LDFLAGS) $(filter-out %wrap.obj maf/maf.hpp,$^) $(LDEXE))
 
 $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: $(HEADERS) maf.i maf/maf.hpp
-	swig -python -builtin -includeall -ignoremissing -c++ -outdir . -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i
+	$(call colorecho,swig -python -builtin -includeall -ignoremissing -c++ -outdir . -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i)
 
 $(BUILD_DIR)/%.obj: %.cpp %.hpp
 	@-if [ ! -d "$(@D)" ]; then python -c 'import os; os.makedirs("$(@D)")' ; fi
-	$(CXX) $(CXXFLAGS) -I.
+	$(call colorecho,$(CXX) $(CXXFLAGS) -I.)
 
 $(BUILD_DIR)/%.obj: %.cpp
 	@-if [ ! -d "$(@D)" ]; then python -c 'import os; os.makedirs("$(@D)")' ; fi
-	$(CXX) $(CXXFLAGS) -I.
+	$(call colorecho,$(CXX) $(CXXFLAGS) -I.)
 
 $(PY_EXT): $(OBJ)
-	$(LD) $(LDSHARED) $^ $(LDFLAGS)
+	$(call colorecho,$(LD) $(LDSHARED) $^ $(LDFLAGS))

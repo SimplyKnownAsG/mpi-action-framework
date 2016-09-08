@@ -1,5 +1,3 @@
-#pragma once
-
 #include "maf/actions/ActionFactory.hpp"
 
 namespace maf {
