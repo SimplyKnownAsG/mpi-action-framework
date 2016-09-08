@@ -75,8 +75,9 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 
 test: test_cpp test_py
 
+test_py: PYTESTFILES=$(call rwildcard, tests/, *.py)
 test_py: $(PY_EXT)
-	$(call colorecho,PYTHONPATH=. mpiexec -n 2 python tests/test.py)
+	$(foreach pytestfile, $(PYTESTFILES), $(call colorecho,PYTHONPATH=. mpiexec -n 2 python $(pytestfile)))
 
 test_cpp: tests/test_cpp.exe
 	$(call colorecho,mpiexec -n 4 $<)

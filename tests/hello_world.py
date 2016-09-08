@@ -5,16 +5,10 @@ import maf
 class HelloWorldAction(maf.Action):
 
     def run(self):
-        maf.maf_print("Hello World! (from Python)")
+        maf.maf_print('Hello World! (from Python) there are {} actions in the stack'.format(len(maf._ACTION_STACK)))
 
     def type_name(self):
         return "HelloWorldAction"
-    
-    def serialize(self, archive):
-        maf.maf_print('serializing {}'.format(self))
-    
-    def __del__(self):
-        maf.maf_print('HelloWorldAction.__del__')
 
 
 class TestBcastController(maf.BcastController):

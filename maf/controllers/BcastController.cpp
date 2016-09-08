@@ -4,6 +4,7 @@
 #include "maf/archives/ReadArchive.hpp"
 #include "maf/archives/WriteArchive.hpp"
 #include "maf/example.hpp"
+#include "maf/actions/ActionFactory.hpp"
 
 namespace maf {
 
@@ -21,7 +22,7 @@ namespace maf {
             archive->bcast();
             std::string type_name;
             (*archive) & type_name;
-            std::shared_ptr<Action> result = Action::Create(type_name);
+            std::shared_ptr<Action> result = ActionFactory::Create(type_name);
             result->serialize(archive);
             return result;
         }

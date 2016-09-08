@@ -7,9 +7,6 @@
 #include <istream>
 #include <sstream>
 
-#include "maf/archives/WriteArchive.hpp"
-#include "maf/archives/ReadArchive.hpp"
-
 namespace maf {
 
     int _get_rank();

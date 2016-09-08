@@ -1,6 +1,6 @@
 
 #include "maf/controllers/Controller.hpp"
-#include "maf/actions/EndLoopAction.hpp"
+#include "maf/actions/ActionFactory.hpp"
 #include <mpi.h>
 
 namespace maf {
@@ -11,7 +11,7 @@ namespace maf {
             MPI_Comm_rank(MPI_COMM_WORLD, &rank);
             if (rank == 0) {
                 this->main();
-                auto act = Action::Create("EndLoopAction");
+                auto act = ActionFactory::Create("EndLoopAction");
                 this->distribute(act);
                 act->run();
             }
@@ -19,6 +19,7 @@ namespace maf {
                 while (true) {
                     std::shared_ptr<Action> action = this->distribute();
                     action->run();
+                    action->tear_down();
                 }
             }
         }

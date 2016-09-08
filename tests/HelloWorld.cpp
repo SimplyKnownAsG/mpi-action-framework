@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
     try {
         // std::shared_ptr<ActionFactory> factory((ActionFactory*)(new TActionFactory<HelloWorldAction>("HelloWorldAction")));
         auto factory = std::shared_ptr<maf::ActionFactory>((maf::ActionFactory*)(new maf::TActionFactory<HelloWorldAction>("HelloWorldAction")));
-        maf::Action::Register(factory);
+        maf::ActionFactory::Register(factory);
 
         TestBcastController controller;
         controller.start();
