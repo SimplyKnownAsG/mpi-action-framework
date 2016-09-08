@@ -1,10 +1,8 @@
 #pragma once
 
 #include <mpi.h>
-#include <vector>
 #include <string>
 #include <iostream>
-#include <istream>
 #include <sstream>
 
 namespace maf {
@@ -29,6 +27,6 @@ namespace maf {
         std::cout << "[" << _get_rank() << "] " << msg.str() << std::endl;
     };
 
-    void maf_print(std::string msg);
+    void log(std::string msg);
 
 }

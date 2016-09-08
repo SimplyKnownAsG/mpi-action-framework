@@ -33,7 +33,6 @@ namespace std {
     }
 };
 
-%feature("director") Thing;
 %feature("director") maf::Action;
 %shared_ptr(maf::Action);
 %shared_ptr(maf::EndLoopAction);
