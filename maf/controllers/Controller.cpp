@@ -12,12 +12,12 @@ namespace maf {
             if (rank == 0) {
                 this->main();
                 auto act = ActionFactory::Create("EndLoopAction");
-                this->distribute(act);
+                this->_default_share(act);
                 act->run();
             }
             else {
                 while (true) {
-                    std::shared_ptr<Action> action = this->distribute();
+                    std::shared_ptr<Action> action = this->_default_share();
                     action->run();
                     action->tear_down();
                 }

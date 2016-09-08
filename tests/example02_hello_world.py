@@ -43,11 +43,11 @@ class TestBcastController(maf.BcastController):
 
     def main(self):
         act = self.action_class()
-        self.distribute(act).run()
+        self.bcast(act).run()
         act2 = self.action_class('Whatever', 2, 44)
-        self.distribute(act2).run()
+        self.bcast(act2).run()
         act = self.action_class('The final act!', sys.maxint, sys.float_info.max)
-        self.distribute(act).run()
+        self.bcast(act).run()
 
 
 maf.register(HelloWorldAction)

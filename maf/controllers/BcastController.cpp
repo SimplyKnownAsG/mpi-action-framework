@@ -8,7 +8,7 @@
 
 namespace maf {
 
-    std::shared_ptr<Action> BcastController::distribute(std::shared_ptr<Action> action) {
+    std::shared_ptr<Action> BcastController::bcast(std::shared_ptr<Action> action) {
         if (action) {
             std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new WriteArchive);
             std::string type_name = action->type_name();
@@ -26,6 +26,10 @@ namespace maf {
             result->serialize(archive);
             return result;
         }
+    };
+
+    std::shared_ptr<Action> BcastController::_default_share(std::shared_ptr<Action> action) {
+        return this->bcast(action);
     };
 
 }

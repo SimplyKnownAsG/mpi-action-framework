@@ -6,7 +6,11 @@ namespace maf {
 
     public:
 
-        std::shared_ptr<Action> distribute(std::shared_ptr<Action> action=NULL);
+        std::shared_ptr<Action> bcast(std::shared_ptr<Action> action=NULL);
+    
+    private:
+
+        std::shared_ptr<Action> _default_share(std::shared_ptr<Action> action=NULL) override;
 
     };
 

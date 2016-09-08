@@ -11,7 +11,14 @@ namespace maf {
 
         virtual void main() = 0;
 
-        virtual std::shared_ptr<Action> distribute(std::shared_ptr<Action> action=NULL) = 0;
+#ifdef SWIG
+%nodirector;
+#endif
+        virtual std::shared_ptr<Action> bcast(std::shared_ptr<Action> action=NULL) = 0;
+    
+    private:
+
+        virtual std::shared_ptr<Action> _default_share(std::shared_ptr<Action> action=NULL) = 0;
 
     };
 
