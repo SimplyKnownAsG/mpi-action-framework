@@ -1,10 +1,23 @@
 #pragma once
 
 #include "maf/actions/Action.hpp"
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace maf {
     class ActionFactory {
+    private:
+        static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> factories;
+
     public:
+
+        static std::shared_ptr<Action> Create(std::string name);
+
+        static std::vector<std::string> Names();
+
+        static void Register(std::shared_ptr<ActionFactory> factory);
+
         const std::string action_name;
 
         ActionFactory(std::string action_name);
