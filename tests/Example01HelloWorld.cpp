@@ -25,7 +25,7 @@ class TestBcastController : public maf::BcastController {
 public:
     void main() {
         std::shared_ptr<maf::Action> act = std::shared_ptr<maf::Action>(new HelloWorldAction);
-        this->distribute(act);
+        this->bcast(act);
         act->run();
     };
 };

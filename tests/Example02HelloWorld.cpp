@@ -48,13 +48,13 @@ class TestBcastController : public maf::BcastController {
 public:
     void main() {
         std::shared_ptr<maf::Action> act = std::shared_ptr<maf::Action>(new HelloWorldAction);
-        this->distribute(act);
+        this->bcast(act);
         act->run();
         act = std::shared_ptr<maf::Action>(new HelloWorldAction("string 1", 2, 3.3, 4.4));
-        this->distribute(act);
+        this->bcast(act);
         act->run();
         act = std::shared_ptr<maf::Action>(new HelloWorldAction("string 2", 4, 66.66, 88.88e88));
-        this->distribute(act);
+        this->bcast(act);
         act->run();
     };
 };
