@@ -1,5 +1,5 @@
 
-#include "maf/example.hpp"
+#include "maf/Log.hpp"
 
 namespace maf {
 
@@ -12,7 +12,7 @@ namespace maf {
         return _rank;
     }
 
-    void maf_print(std::string msg) {
+    void log(std::string msg) {
         mpi_print(msg);
     }
 

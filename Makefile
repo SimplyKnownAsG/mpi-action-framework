@@ -36,6 +36,7 @@ define colorecho
 	@echo $1
 	@tput sgr0
 	@$1
+
 endef
 
 SRC = $(call rwildcard, $(SRC_DIR), *.cpp) $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/Version.cpp
@@ -75,14 +76,14 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 
 test: test_py test_cpp
 
-test_py: PY_TEST_FILES=$(call rwildcard, tests/, *.py)
+test_py: PY_TEST_FILES=$(sort $(call rwildcard, tests/, *.py))
 test_py: $(PY_EXT)
 	$(foreach pytestfile, $(PY_TEST_FILES), $(call colorecho,PYTHONPATH=. mpiexec -n 2 python $(pytestfile)))
 
 $(PY_EXT): $(OBJ)
 	$(call colorecho,$(LD) $(LDSHARED) $^ $(LDFLAGS))
 
-test_cpp: $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp))
+test_cpp: $(sort $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp)))
 	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 2 $(cpp_test_exec)))
 
 tests/%.exe: maf/maf.hpp $(BUILD_DIR)/tests/%.obj $(OBJ)

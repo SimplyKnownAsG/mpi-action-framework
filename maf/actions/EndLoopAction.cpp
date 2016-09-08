@@ -1,5 +1,4 @@
 #include "maf/actions/EndLoopAction.hpp"
-#include "maf/example.hpp"
 
 namespace maf {
 

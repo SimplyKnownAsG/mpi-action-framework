@@ -3,7 +3,6 @@
 #include "maf/controllers/BcastController.hpp"
 #include "maf/archives/ReadArchive.hpp"
 #include "maf/archives/WriteArchive.hpp"
-#include "maf/example.hpp"
 #include "maf/actions/ActionFactory.hpp"
 
 namespace maf {
