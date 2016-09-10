@@ -43,7 +43,7 @@ define colorecho
 
 endef
 
-SRC = $(filter-out %maf_wrap.pp,$(call rwildcard, $(SRC_DIR), *.cpp)) $(SRC_DIR)/Version.cpp
+SRC = $(filter-out %_wrap%,$(call rwildcard, $(SRC_DIR), *.cpp)) $(SRC_DIR)/Version.cpp
 HEADERS = $(filter-out %maf_wrap.hpp maf/maf.hpp, $(call rwildcard, $(SRC_DIR), *.hpp))
 DIRECTORIES = $(sort $(dir $(SRC) $(HEADERS)))
 OBJ = $(patsubst %.cpp,$(BUILD_DIR)/%.obj,$(SRC))
@@ -78,7 +78,7 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 	@echo '}' >> $@
 	@echo "" >> $@
 
-test: test_py test_cpp
+test: test_cpp test_py
 
 test_py: PY_TEST_FILES=$(sort $(call rwildcard, tests/, *.py))
 test_py: $(PY_EXT)
@@ -88,7 +88,7 @@ $(LIBMAF): $(OBJ)
 	@-if [ ! -d "$(@D)" ]; then python -c 'import os; os.makedirs("$(@D)")' ; fi
 	$(call colorecho,$(LD) $(LDSTATIC) $^ $(LDFLAGS))
 
-$(PY_EXT): $(BUILD_DIR)/maf/maf_wrap.obj $(LIBMAF)
+$(PY_EXT): $(LIBMAF) $(BUILD_DIR)/maf/maf_wrap.obj
 	$(call colorecho,$(LD) $(LDSHARED) $^ $(LDFLAGS))
 
 test_cpp: $(sort $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp)))
