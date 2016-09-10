@@ -1,13 +1,11 @@
 #pragma once
 
-#include <mpi.h>
 #include <string>
 #include <iostream>
 #include <sstream>
+#include "maf/Mpi.hpp"
 
 namespace maf {
-
-    int _get_rank();
 
     template<typename T1>
     void flatten(std::ostream& stream, T1 arg1) {
@@ -24,7 +22,7 @@ namespace maf {
     void mpi_print(TArgs... args) {
         std::ostringstream msg;
         flatten(msg, args...);
-        std::cout << "[" << _get_rank() << "] " << msg.str() << std::endl;
+        std::cout << "[" << Mpi::GetRank() << "] " << msg.str() << std::endl;
     };
 
     void log(std::string msg);

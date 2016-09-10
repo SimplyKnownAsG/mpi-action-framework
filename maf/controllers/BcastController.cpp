@@ -7,6 +7,10 @@
 
 namespace maf {
 
+    BcastController::BcastController() : Controller() {
+        // empty;
+    }
+
     std::shared_ptr<Action> BcastController::distribute(std::shared_ptr<Action> action) {
         if (action) {
             std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new WriteArchive);
@@ -25,6 +29,11 @@ namespace maf {
             result->serialize(archive);
             return result;
         }
-    };
+    }
+    
+    std::shared_ptr<Action> BcastController::scatter(std::vector<std::shared_ptr<Action>> actions) {
+        // we will use actions as a stack
+        return NULL;
+    }
 
 }
