@@ -1,6 +1,7 @@
 #include "mpi.h"
 
 #include "maf/controllers/BcastController.hpp"
+#include "maf/controllers/ScatterController.hpp"
 #include "maf/archives/ReadArchive.hpp"
 #include "maf/archives/WriteArchive.hpp"
 #include "maf/actions/ActionFactory.hpp"
@@ -8,6 +9,10 @@
 namespace maf {
 
     BcastController::BcastController() : Controller() {
+        // empty;
+    }
+
+    BcastController::BcastController(std::vector<std::shared_ptr<Action>> actions) : Controller(actions) {
         // empty;
     }
 
@@ -32,12 +37,32 @@ namespace maf {
     }
     
     std::shared_ptr<Action> BcastController::scatter(std::vector<std::shared_ptr<Action>> actions) {
-        // we will use actions as a stack
-        return NULL;
+        std::shared_ptr<Action> controller = std::shared_ptr<Action>(new ScatterController(actions));
+        return controller;
     }
 
-    std::shared_ptr<Action> BcastController::_default_share(std::shared_ptr<Action> action) {
-        return this->bcast(action);
-    };
+    void BcastController::run() {
+        while (!this->_queue.empty()) {
+            auto action = this->_queue.front();
+            this->_queue.pop();
+            this->bcast(action);
+            action->run();
+        }
+        this->_stop();
+    }
+
+    std::string BcastController::type_name() {
+        return "BcastController";
+    }
+
+    std::shared_ptr<Action> BcastController::_wait() {
+        return this->bcast();
+    }
+    
+    void BcastController::_stop() {
+        auto act = ActionFactory::Create("EndLoopAction");
+        this->bcast(act);
+        act->run(); // throws an EndLoopAction exception to successfully terminate .start()
+    }
 
 }

@@ -41,7 +41,7 @@ class TestBcastController(maf.BcastController):
         maf.BcastController.__init__(self)
         self.action_class = action_class
 
-    def main(self):
+    def run(self):
         act = self.action_class()
         self.bcast(act).run()
         act2 = self.action_class('Whatever', 2, 44)

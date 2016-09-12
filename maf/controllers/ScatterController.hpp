@@ -2,13 +2,13 @@
 
 namespace maf {
 
-    class BcastController : public Controller {
+    class ScatterController : public Controller {
 
     public:
     
-        BcastController();
-    
-        BcastController(std::vector<std::shared_ptr<Action>> actions);
+        ScatterController();
+
+        ScatterController(std::vector<std::shared_ptr<Action>> actions);
 
         std::shared_ptr<Action> bcast(std::shared_ptr<Action> action=NULL);
 

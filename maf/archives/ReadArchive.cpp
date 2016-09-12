@@ -7,11 +7,11 @@ namespace maf {
 
     ReadArchive::ReadArchive() : Archive(), _stream() {
 
-    };
+    }
 
     ReadArchive::ReadArchive(std::string msg) : Archive(), _stream(msg) {
 
-    };
+    }
 
     void ReadArchive::bcast(int root) {
         int size;
@@ -23,4 +23,11 @@ namespace maf {
         delete buffer;
     }
 
+    std::string ReadArchive::str() {
+        return this->_stream.str();
+    }
+
+    size_t ReadArchive::length() {
+        this->_stream.tellg();
+    }
 }

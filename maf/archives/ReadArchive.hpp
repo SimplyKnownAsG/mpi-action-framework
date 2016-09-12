@@ -27,6 +27,10 @@ namespace maf {
         });
 
         void bcast(int root=0);
+        
+        std::string str() override;
+
+        size_t length() override;
     };
 
 }

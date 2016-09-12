@@ -46,7 +46,7 @@ public:
 
 class TestBcastController : public maf::BcastController {
 public:
-    void main() {
+    void run() override {
         std::shared_ptr<maf::Action> act = std::shared_ptr<maf::Action>(new HelloWorldAction);
         this->bcast(act);
         act->run();

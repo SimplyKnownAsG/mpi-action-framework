@@ -85,7 +85,7 @@ $(LIBMAF): $(OBJ)
 	$(call colorecho,$(LDSTATIC) $^)
 
 $(PY_EXT): $(LIBMAF) $(BUILD_DIR)/maf/maf_wrap.obj
-	# $< is repeated (implicit in $^) because the symbols are only needed after maf_wrap.obj
+	@# $< is repeated (implicit in $^) because the symbols are only needed after maf_wrap.obj
 	$(call colorecho,$(LDSHARED) $^ $<)
 
 test_cpp: $(sort $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp)))
