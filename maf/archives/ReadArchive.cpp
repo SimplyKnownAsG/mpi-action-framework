@@ -13,6 +13,11 @@ namespace maf {
 
     }
 
+    ReadArchive::ReadArchive(const char* msg, int size) : ReadArchive() {
+        std::string s_msg(msg, size);
+        this->_stream.str(s_msg);
+    }
+
     void ReadArchive::bcast(int root) {
         int size;
         MPI_Bcast(&size, sizeof(int), MPI_INT, root, MPI_COMM_WORLD);

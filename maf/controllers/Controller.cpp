@@ -3,6 +3,8 @@
 #include "maf/actions/ActionFactory.hpp"
 #include "maf/Mpi.hpp"
 
+#include "maf/Log.hpp"
+
 namespace maf {
 
     Controller::Controller() : Action(), rank(Mpi::GetRank()), size(Mpi::GetSize()) {
@@ -21,6 +23,7 @@ namespace maf {
 
     void Controller::start() {
         try {
+            mpi_print(this->type_name(), "::start()");
             if (this->rank == 0) {
                 this->run();
                 this->_stop();

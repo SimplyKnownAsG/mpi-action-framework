@@ -6,6 +6,8 @@
 #include "maf/archives/WriteArchive.hpp"
 #include "maf/actions/ActionFactory.hpp"
 
+#include "maf/Log.hpp"
+
 namespace maf {
 
     BcastController::BcastController() : Controller() {
@@ -37,7 +39,9 @@ namespace maf {
     }
     
     std::shared_ptr<Action> BcastController::scatter(std::vector<std::shared_ptr<Action>> actions) {
+        maf::mpi_print("BcastController::scatter with ", actions.size(), " actions");
         std::shared_ptr<Action> controller = std::shared_ptr<Action>(new ScatterController(actions));
+        this->bcast(controller);
         return controller;
     }
 

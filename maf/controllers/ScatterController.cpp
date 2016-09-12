@@ -5,6 +5,8 @@
 #include "maf/archives/WriteArchive.hpp"
 #include "maf/actions/ActionFactory.hpp"
 
+#include "maf/Log.hpp"
+
 namespace maf {
 
     ScatterController::ScatterController() : Controller() {
@@ -20,6 +22,7 @@ namespace maf {
     }
     
     std::shared_ptr<Action> ScatterController::scatter(std::vector<std::shared_ptr<Action>> actions) {
+        mpi_print("ScatterController::scatter(", actions.size(), ")");
         std::vector<int> send_counts;
         std::vector<int> displacements;
         int send_count = 0;
@@ -32,6 +35,7 @@ namespace maf {
             action->serialize(write_archive);
             int current_disp = write_archive->length();
             send_counts.push_back(current_disp - displacement);
+            mpi_print("ScatterController::scatter() send_counts.back()=", send_counts.back(), "   ", displacements.back());
             displacement = current_disp;
         }
         std::string content = write_archive->str();
@@ -40,19 +44,29 @@ namespace maf {
         MPI_Scatter((void*)(send_counts.data()), 1, MPI_INT,
                     (void*)&recv_count, 1, MPI_INT,
                     0, MPI_COMM_WORLD);
+        mpi_print("ScatterController::scatter() ... recv_count=", recv_count, " total size=", content.size());
         char *recv_buffer = new char[recv_count];
-        MPI_Scatterv((void *)send_buffer, send_counts.data(), displacements.data(), MPI_CHAR,
-                    (void*)&recv_buffer, recv_count, MPI_CHAR,
+        MPI_Scatterv((void*)send_buffer, send_counts.data(), displacements.data(), MPI_CHAR,
+                    (void*)(&recv_buffer), recv_count, MPI_CHAR,
                     0, MPI_COMM_WORLD);
-        std::shared_ptr<Archive> read_archive = std::shared_ptr<Archive>(new ReadArchive(recv_buffer));
+        mpi_print("ScatterController::scatter() ... recv_buffer=...");
+        std::string s(recv_buffer, recv_count);
+        std::shared_ptr<Archive> read_archive = std::shared_ptr<Archive>(new ReadArchive(s));
+        mpi_print("ScatterController::scatter() ... post ReadArchive");
         return ActionFactory::Create(read_archive);
     }
 
     void ScatterController::run() {
-        while (!this->_queue.empty()) {
-            std::vector<std::shared_ptr<Action>> actions;
+        mpi_print("ScatterController::run with ", this->_queue.size(), " actions");
+        if (this->_queue.empty() && this->rank != 0) {
+            this->start();
         }
-        this->_stop();
+        else {
+            // while (!this->_queue.empty()) {
+            //     std::vector<std::shared_ptr<Action>> actions;
+            // }
+            this->_stop();
+        }
     }
 
     std::string ScatterController::type_name() {
@@ -60,25 +74,40 @@ namespace maf {
     }
 
     std::shared_ptr<Action> ScatterController::_wait() {
+        mpi_print("ScatterController::_wait()");
         int recv_count;
         MPI_Scatter((void*)NULL, 1, MPI_INT,
                     (void*)&recv_count, 1, MPI_INT,
                     0, MPI_COMM_WORLD);
+        mpi_print("ScatterController::_wait() ... recv_count=", recv_count);
         char *recv_buffer = new char[recv_count];
-        MPI_Scatterv((void *)NULL, (int *)NULL, (int *)NULL, MPI_CHAR,
+        // for (int ii; ii < recv_count; ii++) {
+        //     mpi_print(" recv_buffer[", ii, "]=", recv_buffer[ii]);
+        // }
+        MPI_Scatterv((void*)NULL, (int*)NULL, (int*)NULL, MPI_CHAR,
                     (void*)&recv_buffer, recv_count, MPI_CHAR,
                     0, MPI_COMM_WORLD);
+        for (int ii; ii < recv_count; ii++) {
+            mpi_print(" recv_buffer[", ii, "]=", recv_buffer[ii]);
+        }
+        mpi_print("ScatterController::scatter() ... recv_buffer=...");
+        std::string s(recv_buffer, recv_count);
+        mpi_print("ScatterController::scatter() ... recv_buffer=", s);
         std::shared_ptr<Archive> read_archive = std::shared_ptr<Archive>(new ReadArchive(recv_buffer));
         return ActionFactory::Create(read_archive);
     }
 
     void ScatterController::_stop() {
+        mpi_print("ScatterController::_stop()");
         std::vector<std::shared_ptr<Action>> actions;
-        auto end_act = ActionFactory::Create("EndLoopAction");
-        for (int ii = 0; ii < this->size; ii++) {
-            actions.push_back(end_act);
-        }
-        this->scatter(actions);
+        actions.push_back(ActionFactory::Create("EndLoopAction"));
+        actions.push_back(ActionFactory::Create("BcastController"));
+        actions.push_back(ActionFactory::Create("ScatterController"));
+        // auto end_act = ActionFactory::Create("EndLoopAction");
+        // for (int ii = 0; ii < this->size; ii++) {
+        //     actions.push_back(end_act);
+        // }
+        auto end_act = this->scatter(actions);
         end_act->run(); // throws an EndLoopAction exception to successfully terminate .start()
     }
 
