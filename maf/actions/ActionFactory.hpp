@@ -29,7 +29,7 @@ namespace maf {
     };
 
     template<class TAction>
-    class TActionFactory : ActionFactory {
+    class TActionFactory : public ActionFactory {
     public:
         TActionFactory(std::string action_name) : ActionFactory(action_name) {
 

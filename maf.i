@@ -33,14 +33,19 @@ namespace std {
     }
 };
 
-%feature("director") Thing;
 %feature("director") maf::Action;
 %shared_ptr(maf::Action);
+%template(ActionVector) std::vector<std::shared_ptr<maf::Action>>;
+%shared_ptr(maf::Exception);
 %shared_ptr(maf::EndLoopAction);
 %feature("director") maf::ActionFactory;
 %shared_ptr(maf::ActionFactory);
 %feature("director") maf::Controller;
+%feature("nodirector") maf::Controller::distribute;
+%feature("nodirector") maf::Controller::scatter;
 %feature("director") maf::BcastController;
+%feature("nodirector") maf::BcastController::distribute;
+%feature("nodirector") maf::BcastController::scatter;
 %shared_ptr(maf::Archive);
 %shared_ptr(maf::ReadArchive);
 %shared_ptr(maf::WriteArchive);

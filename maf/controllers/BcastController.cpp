@@ -3,10 +3,13 @@
 #include "maf/controllers/BcastController.hpp"
 #include "maf/archives/ReadArchive.hpp"
 #include "maf/archives/WriteArchive.hpp"
-#include "maf/example.hpp"
 #include "maf/actions/ActionFactory.hpp"
 
 namespace maf {
+
+    BcastController::BcastController() : Controller() {
+        // empty;
+    }
 
     std::shared_ptr<Action> BcastController::bcast(std::shared_ptr<Action> action) {
         if (action) {
@@ -26,7 +29,12 @@ namespace maf {
             result->serialize(archive);
             return result;
         }
-    };
+    }
+    
+    std::shared_ptr<Action> BcastController::scatter(std::vector<std::shared_ptr<Action>> actions) {
+        // we will use actions as a stack
+        return NULL;
+    }
 
     std::shared_ptr<Action> BcastController::_default_share(std::shared_ptr<Action> action) {
         return this->bcast(action);

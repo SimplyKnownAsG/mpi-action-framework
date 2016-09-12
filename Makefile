@@ -1,19 +1,22 @@
 
 ifeq ($(OS),Windows_NT)
 	CXX=cl
-	LD=link
 	CXXFLAGS= /nologo /EHsc /fp:strict /MP "/IC:\Program Files\Microsoft HPC Pack 2012\Inc" "/IC:\Python27\include" /I. /c $< /Fo:$@
 	LDFLAGS= /nologo /incremental:no '/libpath:C:\Python27\libs' '/libpath:C:\Program Files\Microsoft HPC Pack 2012\Lib\amd64' msmpi.lib
-	LDSHARED= /DLL /out:$@
-	LDEXE= /out:$@
+	LDSHARED=link $(LDFLAGS) /DLL /out:$@
+	LDSTATIC=link $(LDFLAGS) /lib /out:$@
+	LDEXE=link $(LDFLAGS) /out:$@
+	LIBMAF=lib/libmaf.lib
 	PY_EXT=_maf.pyd
 else
 	CXX=mpic++
 	LD=mpic++
 	CXXFLAGS= -fPIC -std=c++1y -c $< -o $@ -I/usr/include/python2.7
 	LDFLAGS= -fPIC
-	LDSHARED= -shared -o $@
-	LDEXE= -o $@
+	LDSHARED=mpic++ -shared -o $@
+	LDSTATIC=ar crs $@
+	LDEXE=mpic++ -o $@
+	LIBMAF=lib/libmaf.a
 	PY_EXT=_maf.so
 endif
 
@@ -36,9 +39,10 @@ define colorecho
 	@echo $1
 	@tput sgr0
 	@$1
+
 endef
 
-SRC = $(call rwildcard, $(SRC_DIR), *.cpp) $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/Version.cpp
+SRC = $(filter-out %_wrap%,$(call rwildcard, $(SRC_DIR), *.cpp)) $(SRC_DIR)/Version.cpp
 HEADERS = $(filter-out %maf_wrap.hpp maf/maf.hpp, $(call rwildcard, $(SRC_DIR), *.hpp))
 DIRECTORIES = $(sort $(dir $(SRC) $(HEADERS)))
 OBJ = $(patsubst %.cpp,$(BUILD_DIR)/%.obj,$(SRC))
@@ -52,11 +56,8 @@ release: test
 debug: test
 
 clean:
-	-$(RM) -rf ./debug/ ./release/
+	-$(RM) -rf ./debug/ ./release/ ./lib/
 	-$(RM) $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp _maf.* maf/Version.cpp tests/test_cpp.exe
-
-tags: $(SRC)
-	ctags $(SRC)
 
 maf/maf.hpp: $(HEADERS)
 	@echo "// this file is auto-generated, do not modify" > $@
@@ -73,20 +74,25 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 	@echo '}' >> $@
 	@echo "" >> $@
 
-test: test_py test_cpp
+test: test_cpp test_py
 
-test_py: PY_TEST_FILES=$(call rwildcard, tests/, *.py)
+test_py: PY_TEST_FILES=$(sort $(call rwildcard, tests/, *.py))
 test_py: $(PY_EXT)
 	$(foreach pytestfile, $(PY_TEST_FILES), $(call colorecho,PYTHONPATH=. mpiexec -n 2 python $(pytestfile)))
 
-$(PY_EXT): $(OBJ)
-	$(call colorecho,$(LD) $(LDSHARED) $^ $(LDFLAGS))
+$(LIBMAF): $(OBJ)
+	@-if [ ! -d "$(@D)" ]; then python -c 'import os; os.makedirs("$(@D)")' ; fi
+	$(call colorecho,$(LDSTATIC) $^)
 
-test_cpp: $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp))
+$(PY_EXT): $(LIBMAF) $(BUILD_DIR)/maf/maf_wrap.obj
+	# $< is repeated (implicit in $^) because the symbols are only needed after maf_wrap.obj
+	$(call colorecho,$(LDSHARED) $^ $<)
+
+test_cpp: $(sort $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp)))
 	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 2 $(cpp_test_exec)))
 
-tests/%.exe: maf/maf.hpp $(BUILD_DIR)/tests/%.obj $(OBJ)
-	$(call colorecho,$(LD) $(LDFLAGS) $(filter-out %wrap.obj maf/maf.hpp,$^) $(LDEXE))
+tests/%.exe: maf/maf.hpp $(BUILD_DIR)/tests/%.obj $(LIBMAF)
+	$(call colorecho,$(LDEXE) $(filter-out maf/maf.hpp,$^))
 
 $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: maf.i maf/maf.hpp
 	$(call colorecho,swig -python -builtin -includeall -ignoremissing -c++ -outdir . -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i)
