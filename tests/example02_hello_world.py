@@ -16,7 +16,7 @@ class HelloWorldAction(maf.Action):
         self.my_float = my_float
 
     def run(self):
-        maf.maf_print('{} my_int: {} my_float: {}'.format(self.my_string, self.my_int, self.my_float))
+        maf.log('{} my_int: {} my_float: {}'.format(self.my_string, self.my_int, self.my_float))
     
     def serialize(self, archive):
         self.my_string = archive.rw_string(self.my_string)
@@ -65,5 +65,5 @@ controller = TestBcastController(PickleSerialer)
 controller.start()
 pickle_time = timeit.default_timer() - start
 
-maf.maf_print('SERIALIZE time: {}\n'
-          '    PICKLE time   : {}'.format(serializer_time, pickle_time))
+maf.log('SERIALIZE time: {}\n'
+    '    PICKLE time   : {}'.format(serializer_time, pickle_time))

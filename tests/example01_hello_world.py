@@ -5,7 +5,7 @@ import maf
 class HelloWorldAction(maf.Action):
 
     def run(self):
-        maf.maf_print('Hello World! (from Python) there are {} actions in the stack'.format(len(maf._ACTION_STACK)))
+        maf.log('Hello World! (from Python) there are {} actions in the stack'.format(len(maf._ACTION_STACK)))
 
 
 class TestBcastController(maf.BcastController):

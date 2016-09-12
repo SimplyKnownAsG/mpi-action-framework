@@ -1,15 +1,20 @@
 
 #include "maf/controllers/Controller.hpp"
 #include "maf/actions/ActionFactory.hpp"
-#include <mpi.h>
+#include "maf/Mpi.hpp"
 
 namespace maf {
 
+    Controller::Controller() : rank(Mpi::GetRank()), size(Mpi::GetSize()) {
+    }
+
+    Controller::~Controller() {
+        return;
+    }
+
     void Controller::start() {
         try {
-            int rank;
-            MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-            if (rank == 0) {
+            if (this->rank == 0) {
                 this->main();
                 auto act = ActionFactory::Create("EndLoopAction");
                 this->_default_share(act);
