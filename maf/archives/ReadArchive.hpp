@@ -14,6 +14,8 @@ namespace maf {
 
         ReadArchive(std::string msg);
 
+        ReadArchive(const char* msg, int size);
+
         CREATE_OPERATOR_AMP(
             override {
             this->_stream.read((char*)(&val), sizeof(val));

@@ -11,11 +11,11 @@ ifeq ($(OS),Windows_NT)
 else
 	CXX=mpic++
 	LD=mpic++
-	CXXFLAGS= -fPIC -std=c++1y -c $< -o $@ -I/usr/include/python2.7
+	CXXFLAGS= -fPIC -g -std=c++1y -c $< -o $@ -I/usr/include/python2.7
 	LDFLAGS= -fPIC
-	LDSHARED=mpic++ -shared -o $@
+	LDSHARED=mpic++ -g -shared -o $@
 	LDSTATIC=ar crs $@
-	LDEXE=mpic++ -o $@
+	LDEXE=mpic++ -g -o $@
 	LIBMAF=lib/libmaf.a
 	PY_EXT=_maf.so
 endif
@@ -89,7 +89,7 @@ $(PY_EXT): $(LIBMAF) $(BUILD_DIR)/maf/maf_wrap.obj
 	$(call colorecho,$(LDSHARED) $^ $<)
 
 test_cpp: $(sort $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp)))
-	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 2 $(cpp_test_exec)))
+	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 3 $(cpp_test_exec)))
 
 tests/%.exe: maf/maf.hpp $(BUILD_DIR)/tests/%.obj $(LIBMAF)
 	$(call colorecho,$(LDEXE) $(filter-out maf/maf.hpp,$^))
