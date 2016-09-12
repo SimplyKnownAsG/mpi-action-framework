@@ -20,7 +20,7 @@ namespace maf {
         virtual ~Action() {
         };
 
-        virtual void run();
+        virtual void run() = 0;
 
         virtual void serialize(std::shared_ptr<Archive> archive);
 

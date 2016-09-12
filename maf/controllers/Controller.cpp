@@ -5,7 +5,14 @@
 
 namespace maf {
 
-    Controller::Controller() : rank(Mpi::GetRank()), size(Mpi::GetSize()) {
+    Controller::Controller() : Action(), rank(Mpi::GetRank()), size(Mpi::GetSize()) {
+
+    }
+    
+    Controller::Controller(std::vector<std::shared_ptr<Action>> queue) : Controller() {
+        for (auto action : queue) {
+            this->_queue.push(action);
+        }
     }
 
     Controller::~Controller() {
@@ -15,14 +22,12 @@ namespace maf {
     void Controller::start() {
         try {
             if (this->rank == 0) {
-                this->main();
-                auto act = ActionFactory::Create("EndLoopAction");
-                this->_default_share(act);
-                act->run();
+                this->run();
+                this->_stop();
             }
             else {
                 while (true) {
-                    std::shared_ptr<Action> action = this->_default_share();
+                    std::shared_ptr<Action> action = this->_wait();
                     action->run();
                     action->tear_down();
                 }

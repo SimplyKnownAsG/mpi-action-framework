@@ -1,6 +1,7 @@
 #pragma once
 
 #include "maf/actions/Action.hpp"
+#include "maf/archives/Archive.hpp"
 #include <memory>
 #include <string>
 #include <vector>
@@ -13,6 +14,8 @@ namespace maf {
     public:
 
         static std::shared_ptr<Action> Create(std::string name);
+
+        static std::shared_ptr<Action> Create(std::shared_ptr<Archive>& archive);
 
         static std::vector<std::string> Names();
 

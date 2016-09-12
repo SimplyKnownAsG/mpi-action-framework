@@ -2,9 +2,16 @@
 
 #include "maf/actions/Action.hpp"
 
+#include <queue>
+
 namespace maf {
 
-    class Controller {
+    class Controller : public Action {
+    
+    protected:
+
+        std::queue<std::shared_ptr<Action>> _queue;
+
     public:
 
         const int rank;
@@ -13,22 +20,21 @@ namespace maf {
 
         Controller();
 
+        Controller(std::vector<std::shared_ptr<Action>> queue);
+
         virtual ~Controller();
         
         void start();
 
-        virtual void main() = 0;
-
-#ifdef SWIG
-%nodirector;
-#endif
         virtual std::shared_ptr<Action> bcast(std::shared_ptr<Action> action=NULL) = 0;
+
+        virtual std::shared_ptr<Action> scatter(std::vector<std::shared_ptr<Action>> actions) = 0;
     
     private:
 
-        virtual std::shared_ptr<Action> _default_share(std::shared_ptr<Action> action=NULL) = 0;
+        virtual std::shared_ptr<Action> _wait() = 0;
 
-        virtual std::shared_ptr<Action> scatter(std::vector<std::shared_ptr<Action>> actions) = 0;
+        virtual void _stop() = 0;
 
     };
 

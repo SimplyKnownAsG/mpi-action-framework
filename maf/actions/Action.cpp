@@ -8,10 +8,6 @@ namespace maf {
         this->transmitted = false;
     }
 
-    void Action::run() {
-        return;
-    }
-
     void Action::serialize(std::shared_ptr<Archive> archive) {
         return;
     }

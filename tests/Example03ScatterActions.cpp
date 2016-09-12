@@ -46,14 +46,16 @@ public:
 
 class TestBcastController : public maf::BcastController {
 public:
-    void main() {
+    void run() override {
         std::vector<std::shared_ptr<maf::Action>> actions;
         for (int ii = 0; ii < this->rank; ii++) {
             auto action = std::shared_ptr<maf::Action>(new HelloWorldAction("Hello", ii * ii, ii * 1.1f, ii * ii * 111.111));
             actions.push_back(action);
         }
         auto act = this->scatter(actions);
-        act->run();
+        if (act) {
+            act->run();
+        }
     };
 };
 

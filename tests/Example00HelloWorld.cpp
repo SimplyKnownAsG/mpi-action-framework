@@ -21,15 +21,6 @@ public:
 
 };
 
-class TestBcastController : public maf::BcastController {
-public:
-    void run() {
-        std::shared_ptr<maf::Action> act = std::shared_ptr<maf::Action>(new HelloWorldAction);
-        this->bcast(act);
-        act->run();
-    };
-};
-
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
 
@@ -38,7 +29,9 @@ int main(int argc, char* argv[]) {
         auto factory = std::shared_ptr<maf::ActionFactory>((maf::ActionFactory*)(new maf::TActionFactory<HelloWorldAction>("HelloWorldAction")));
         maf::ActionFactory::Register(factory);
 
-        TestBcastController controller;
+        std::vector<std::shared_ptr<maf::Action>> actions;
+        actions.push_back(std::shared_ptr<maf::Action>(new HelloWorldAction));
+        maf::BcastController controller(actions);
         controller.start();
     }
     catch (std::exception* ex) {
