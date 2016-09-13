@@ -16,11 +16,11 @@ namespace maf {
         MPI_Bcast((void*)buffer, size * sizeof(char), MPI_CHAR, root, MPI_COMM_WORLD);
         // delete buffer; not needed -- buffer_as_string gets deleted when it goes out of scope
     }
-    
+
     std::string WriteArchive::str() {
         return this->_stream.str();
     }
-    
+
     size_t WriteArchive::length() {
         return this->_stream.tellp();
     }

@@ -16,4 +16,9 @@ namespace maf {
         return;
     }
 
+    void Action::start() {
+        this->run();
+        this->tear_down();
+    }
+
 }

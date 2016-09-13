@@ -16,7 +16,7 @@ namespace maf {
         CREATE_OPERATOR_AMP(override {
             this->_stream.write((char*)(&val), sizeof(val));
         },
-        
+
         override {
             size_t size = val.size();
             this->_stream.write((char*)(&size), sizeof(size));
