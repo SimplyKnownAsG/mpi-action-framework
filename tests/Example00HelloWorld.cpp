@@ -36,9 +36,11 @@ int main(int argc, char* argv[]) {
     }
     catch (std::exception* ex) {
         maf::mpi_print("FAILED: ", ex->what());
+        MPI_Abort(MPI_COMM_WORLD, -1);
     }
     catch (...) {
         maf::mpi_print("FAILED: no idea what happened");
+        MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
     MPI_Finalize();

@@ -1,7 +1,7 @@
 
 ifeq ($(OS),Windows_NT)
 	CXX=cl
-	CXXFLAGS= /nologo /EHsc /fp:strict /MP "/IC:\Program Files\Microsoft HPC Pack 2012\Inc" "/IC:\Python27\include" /I. /c $< /Fo:$@
+	CXXFLAGS= /nologo /EHa /fp:strict /MP "/IC:\Program Files\Microsoft HPC Pack 2012\Inc" "/IC:\Python27\include" /I. /c $< /Fo:$@
 	LDFLAGS= /nologo /incremental:no '/libpath:C:\Python27\libs' '/libpath:C:\Program Files\Microsoft HPC Pack 2012\Lib\amd64' msmpi.lib
 	LDSHARED=link $(LDFLAGS) /DLL /out:$@
 	LDSTATIC=lib $(LDFLAGS) /out:$@
@@ -56,8 +56,10 @@ release: test
 debug: test
 
 clean:
-	-$(RM) -rf ./debug/ ./release/ ./lib/
-	-$(RM) $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp _maf.* maf/Version.cpp tests/test_cpp.exe
+	-$(RM) -r ./debug/ ./release/ ./lib/
+	-$(RM) maf/maf.hpp maf/Version.cpp
+	-$(RM) $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp _maf.* maf.py maf.pyc
+	-$(RM) tests/*.exe tests/*.exp tests/*.lib
 
 maf/maf.hpp: $(HEADERS)
 	@echo "// this file is auto-generated, do not modify" > $@

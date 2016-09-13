@@ -5,10 +5,12 @@
 
 namespace maf {
 
-    class EndLoopAction : public Action, public Exception, public std::enable_shared_from_this<Action> {
+    class EndLoopAction : public Action, public Exception {
 
     public:
         EndLoopAction();
+
+        ~EndLoopAction();
 
         void run() override;
 
