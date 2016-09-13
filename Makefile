@@ -4,7 +4,7 @@ ifeq ($(OS),Windows_NT)
 	CXXFLAGS= /nologo /EHsc /fp:strict /MP "/IC:\Program Files\Microsoft HPC Pack 2012\Inc" "/IC:\Python27\include" /I. /c $< /Fo:$@
 	LDFLAGS= /nologo /incremental:no '/libpath:C:\Python27\libs' '/libpath:C:\Program Files\Microsoft HPC Pack 2012\Lib\amd64' msmpi.lib
 	LDSHARED=link $(LDFLAGS) /DLL /out:$@
-	LDSTATIC=link $(LDFLAGS) /lib /out:$@
+	LDSTATIC=lib $(LDFLAGS) /out:$@
 	LDEXE=link $(LDFLAGS) /out:$@
 	LIBMAF=lib/libmaf.lib
 	PY_EXT=_maf.pyd
