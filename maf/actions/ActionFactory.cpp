@@ -4,7 +4,7 @@
 #include "maf/controllers/BcastController.hpp"
 
 namespace maf {
-    
+
     static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> initialize_factories() {
         std::unordered_map<std::string, std::shared_ptr<ActionFactory>> factories;
         auto end_loop = std::shared_ptr<ActionFactory>(new TActionFactory<EndLoopAction>("EndLoopAction"));
@@ -73,6 +73,6 @@ namespace maf {
 
     ActionFactory::ActionFactory(std::string action_name)
         : action_name(action_name) {
-            
+
     }
 }

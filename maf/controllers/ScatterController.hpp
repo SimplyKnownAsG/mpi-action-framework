@@ -5,14 +5,16 @@ namespace maf {
     class ScatterController : public Controller {
 
     public:
-    
+
         ScatterController();
 
         ScatterController(std::vector<std::shared_ptr<Action>> actions);
 
-        std::shared_ptr<Action> bcast(std::shared_ptr<Action> action=NULL);
+        void bcast(std::shared_ptr<Action> action=NULL) override;
 
-        std::shared_ptr<Action> scatter(std::vector<std::shared_ptr<Action>> actions);
+        void bcast(std::vector<std::shared_ptr<Action>> actions) override;
+
+        void scatter(std::vector<std::shared_ptr<Action>> actions) override;
 
         virtual void run() override;
 
@@ -20,7 +22,7 @@ namespace maf {
 
     private:
 
-        std::shared_ptr<Action> _wait() override;
+        void _wait() override;
 
         void _stop() override;
 

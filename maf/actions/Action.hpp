@@ -22,6 +22,8 @@ namespace maf {
 
         virtual void run() = 0;
 
+        virtual void start();
+
         virtual void serialize(std::shared_ptr<Archive> archive);
 
         virtual void tear_down();

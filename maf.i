@@ -34,6 +34,7 @@ namespace std {
 };
 
 %feature("director") maf::Action;
+%feature("director") maf::Action::start;
 %shared_ptr(maf::Action);
 %template(ActionVector) std::vector<std::shared_ptr<maf::Action>>;
 %shared_ptr(maf::Exception);

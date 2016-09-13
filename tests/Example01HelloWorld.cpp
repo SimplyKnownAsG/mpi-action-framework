@@ -24,9 +24,7 @@ public:
 class TestBcastController : public maf::BcastController {
 public:
     void run() {
-        std::shared_ptr<maf::Action> act = std::shared_ptr<maf::Action>(new HelloWorldAction);
-        this->bcast(act);
-        act->run();
+        this->bcast(std::shared_ptr<maf::Action>(new HelloWorldAction));
     };
 };
 
@@ -43,9 +41,11 @@ int main(int argc, char* argv[]) {
     }
     catch (std::exception* ex) {
         maf::mpi_print("FAILED: ", ex->what());
+        return -1;
     }
     catch (...) {
         maf::mpi_print("FAILED: no idea what happened");
+        return -1;
     }
 
     MPI_Finalize();

@@ -8,7 +8,7 @@ namespace maf {
     Controller::Controller() : Action(), rank(Mpi::GetRank()), size(Mpi::GetSize()), _queue() {
 
     }
-    
+
     Controller::Controller(std::vector<std::shared_ptr<Action>> queue) : Controller() {
         for (auto action : queue) {
             this->_queue.push(action);
@@ -27,13 +27,11 @@ namespace maf {
             }
             else {
                 while (true) {
-                    std::shared_ptr<Action> action = this->_wait();
-                    action->run();
-                    action->tear_down();
+                    this->_wait();
                 }
             }
         }
-        catch (std::shared_ptr<Action> action) {
+        catch (std::shared_ptr<Action>& action) {
             // success
         }
     }

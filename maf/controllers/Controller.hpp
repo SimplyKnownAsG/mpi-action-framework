@@ -7,7 +7,7 @@
 namespace maf {
 
     class Controller : public Action {
-    
+
     protected:
 
         std::queue<std::shared_ptr<Action>> _queue;
@@ -23,16 +23,18 @@ namespace maf {
         Controller(std::vector<std::shared_ptr<Action>> queue);
 
         virtual ~Controller();
-        
-        void start();
 
-        virtual std::shared_ptr<Action> bcast(std::shared_ptr<Action> action=NULL) = 0;
+        void start() override;
 
-        virtual std::shared_ptr<Action> scatter(std::vector<std::shared_ptr<Action>> actions) = 0;
-    
+        virtual void bcast(std::shared_ptr<Action> action=NULL) = 0;
+
+        virtual void bcast(std::vector<std::shared_ptr<Action>> actions) = 0;
+
+        virtual void scatter(std::vector<std::shared_ptr<Action>> actions) = 0;
+
     private:
 
-        virtual std::shared_ptr<Action> _wait() = 0;
+        virtual void _wait() = 0;
 
         virtual void _stop() = 0;
 

@@ -9,5 +9,5 @@ namespace maf {
 
         static int GetSize();
     };
-    
+
 }

@@ -24,11 +24,11 @@ public:
 
     void run() {
         maf::mpi_print("Hello World! (from c++)",
-            "\n     my_string: `", this->my_string,
-            "`\n     my_int: `", this->my_int,
-            "`\n     my_float: `", this->my_float,
-            "`\n     my_double: `", this->my_double, "`"
-            );
+                       "     my_string: `", this->my_string,
+                       "`     my_int: `", this->my_int,
+                       "`     my_float: `", this->my_float,
+                       "`     my_double: `", this->my_double, "`"
+                      );
     };
 
     void serialize(std::shared_ptr<maf::Archive> archive) {
@@ -44,18 +44,23 @@ public:
 
 };
 
+
+static std::vector<std::shared_ptr<maf::Action>> GetActions(int action_count) {
+    std::vector<std::shared_ptr<maf::Action>> actions;
+    for (int ii = 0; ii < action_count; ii++) {
+        actions.push_back(std::shared_ptr<maf::Action>(new HelloWorldAction(std::string(ii, 's'), 2 * ii, 3.3 * ii, 4.4 * ii * ii)));
+    }
+    return actions;
+}
+
 class TestBcastController : public maf::BcastController {
 public:
+
     void run() override {
-        std::shared_ptr<maf::Action> act = std::shared_ptr<maf::Action>(new HelloWorldAction);
-        this->bcast(act);
-        act->run();
-        act = std::shared_ptr<maf::Action>(new HelloWorldAction("string 1", 2, 3.3, 4.4));
-        this->bcast(act);
-        act->run();
-        act = std::shared_ptr<maf::Action>(new HelloWorldAction("string 2", 4, 66.66, 88.88e88));
-        this->bcast(act);
-        act->run();
+        for (auto action : GetActions(3)) {
+            this->bcast(action);
+        }
+        this->bcast(GetActions(3));
     };
 };
 
@@ -67,8 +72,26 @@ int main(int argc, char* argv[]) {
         auto factory = std::shared_ptr<maf::ActionFactory>((maf::ActionFactory*)(new maf::TActionFactory<HelloWorldAction>("HelloWorldAction")));
         maf::ActionFactory::Register(factory);
 
+        MPI_Barrier(MPI_COMM_WORLD);
+        maf::mpi_print("===== TestBcastController controller;");
+        MPI_Barrier(MPI_COMM_WORLD);
+
         TestBcastController controller;
         controller.start();
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        maf::mpi_print("===== maf::BcastController controller2(GetActions(3));");
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        maf::BcastController controller2(GetActions(3));
+        controller2.start();
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        maf::mpi_print("===== maf::ScatterController controller3(GetActions(3));");
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        maf::ScatterController controller3(GetActions(3));
+        controller3.start();
     }
     catch (std::exception* ex) {
         maf::mpi_print("FAILED: ", ex->what());

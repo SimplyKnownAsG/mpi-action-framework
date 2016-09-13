@@ -14,7 +14,7 @@ namespace maf {
 
         std::string _message;
 
-        void update_message(std::exception *ex);
+        void update_message(std::exception* ex);
 
     public:
 
@@ -22,17 +22,17 @@ namespace maf {
         Exception(std::string message);
 
         /// Create an exception from an std::exception.
-        Exception(std::exception *exception);
+        Exception(std::exception* exception);
 
         /// Create an exception with both a message, and in inner exception.
-        Exception(std::string message, Exception *inner_exception);
+        Exception(std::string message, Exception* inner_exception);
 
         /// Create an exception with both a message, and in inner exception.
-        Exception(std::string message, std::exception *inner_exception);
+        Exception(std::string message, std::exception* inner_exception);
 
         /// Returns a string representation of the issue.
         const char* what();
-        
+
     };
 
 
