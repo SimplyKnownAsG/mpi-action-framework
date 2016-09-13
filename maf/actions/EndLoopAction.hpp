@@ -8,11 +8,11 @@ namespace maf {
     class EndLoopAction : public Action, public Exception, public std::enable_shared_from_this<Action> {
 
     public:
-        EndLoopAction() : Exception("ending the loop"), Action() { };
+        EndLoopAction();
 
         void run() override;
 
-        std::string type_name() { return "EndLoopAction"; }
+        std::string type_name() override;
     };
 
 }

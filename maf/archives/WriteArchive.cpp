@@ -22,7 +22,7 @@ namespace maf {
     }
     
     size_t WriteArchive::length() {
-        this->_stream.tellp();
+        return this->_stream.tellp();
     }
 
 }

@@ -11,11 +11,11 @@ ifeq ($(OS),Windows_NT)
 else
 	CXX=mpic++
 	LD=mpic++
-	CXXFLAGS= -fPIC -g -std=c++1y -c $< -o $@ -I/usr/include/python2.7
+	CXXFLAGS= -fPIC -Wall -std=c++1y -c $< -o $@ -I/usr/include/python2.7
 	LDFLAGS= -fPIC
-	LDSHARED=mpic++ -g -shared -o $@
+	LDSHARED=mpic++ -Wall -shared -o $@
 	LDSTATIC=ar crs $@
-	LDEXE=mpic++ -g -o $@
+	LDEXE=mpic++ -Wall -o $@
 	LIBMAF=lib/libmaf.a
 	PY_EXT=_maf.so
 endif

@@ -36,6 +36,7 @@ namespace maf {
         (*archive) & name;
         auto action = ActionFactory::Create(name);
         action->serialize(archive);
+        return action;
     }
 
     void ActionFactory::Register(std::shared_ptr<ActionFactory> factory) {
