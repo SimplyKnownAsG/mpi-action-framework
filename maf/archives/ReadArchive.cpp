@@ -33,6 +33,6 @@ namespace maf {
     }
 
     size_t ReadArchive::length() {
-        this->_stream.tellg();
+        return this->_stream.tellg();
     }
 }

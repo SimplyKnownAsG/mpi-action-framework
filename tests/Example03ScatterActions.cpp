@@ -73,6 +73,9 @@ int main(int argc, char* argv[]) {
     catch (std::exception* ex) {
         maf::mpi_print("FAILED: ", ex->what());
     }
+    catch (std::exception& ex) {
+        maf::mpi_print("FAILED: ", ex.what());
+    }
     catch (...) {
         maf::mpi_print("FAILED: no idea what happened");
     }
