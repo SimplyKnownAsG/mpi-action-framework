@@ -18,7 +18,7 @@ namespace maf {
     }
 
     std::shared_ptr<Action> ScatterController::bcast(std::shared_ptr<Action> action) {
-
+        return NULL;
     }
     
     std::shared_ptr<Action> ScatterController::scatter(std::vector<std::shared_ptr<Action>> actions) {
