@@ -5,11 +5,18 @@
 
 namespace maf {
     
-    std::unordered_map<std::string, std::shared_ptr<ActionFactory>> ActionFactory::factories {
-        {"EndLoopAction", std::shared_ptr<ActionFactory>((ActionFactory*)(new TActionFactory<EndLoopAction>("EndLoopAction")))},
-        {"ScatterController", std::shared_ptr<ActionFactory>((ActionFactory*)(new TActionFactory<ScatterController>("ScatterController")))},
-        {"BcastController", std::shared_ptr<ActionFactory>((ActionFactory*)(new TActionFactory<BcastController>("BcastController")))}
-    };
+    static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> initialize_factories() {
+        std::unordered_map<std::string, std::shared_ptr<ActionFactory>> factories;
+        auto end_loop = std::shared_ptr<ActionFactory>(new TActionFactory<EndLoopAction>("EndLoopAction"));
+        auto scatter = std::shared_ptr<ActionFactory>(new TActionFactory<ScatterController>("ScatterController"));
+        auto bcast = std::shared_ptr<ActionFactory>(new TActionFactory<BcastController>("BcastController"));
+        factories[end_loop->action_name] = end_loop;
+        factories[scatter->action_name] = scatter;
+        factories[bcast->action_name] = bcast;
+        return factories;
+    }
+
+    std::unordered_map<std::string, std::shared_ptr<ActionFactory>> ActionFactory::factories = initialize_factories();
 
     std::vector<std::string> ActionFactory::Names() {
         std::vector<std::string> names;
@@ -22,11 +29,22 @@ namespace maf {
     std::shared_ptr<Action> ActionFactory::Create(std::string name) {
         try {
             auto factory = ActionFactory::factories.at(name);
-            return factory->create_action();
+            auto action = factory->create_action();
+            return action;
         }
         catch (std::out_of_range* ex) {
             std::ostringstream msg;
-            msg << "No action with the name `" << name << "` has been registered.";
+            msg << "No action with the name `" << name << "` has been registered:" << ex->what();
+            throw new Exception(msg.str());
+        }
+        catch (std::out_of_range& ex) {
+            std::ostringstream msg;
+            msg << "No action with the name `" << name << "` has been registered: " << ex.what();
+            throw new Exception(msg.str());
+        }
+        catch (...) {
+            std::ostringstream msg;
+            msg << "NO IDEA: No action with the name `" << name << "` has been registered.";
             throw new Exception(msg.str());
         }
     }
@@ -55,6 +73,6 @@ namespace maf {
 
     ActionFactory::ActionFactory(std::string action_name)
         : action_name(action_name) {
-
+            
     }
 }

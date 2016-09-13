@@ -38,8 +38,8 @@ namespace maf {
 
         };
 
-        virtual std::shared_ptr<Action> create_action() {
-            return std::shared_ptr<Action>(new TAction);
+        std::shared_ptr<Action> create_action() {
+            return std::shared_ptr<Action>((Action*)new TAction);
         };
     };
 }

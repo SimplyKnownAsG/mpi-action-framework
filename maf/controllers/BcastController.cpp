@@ -30,10 +30,7 @@ namespace maf {
         else {
             std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new ReadArchive);
             archive->bcast();
-            std::string type_name;
-            (*archive) & type_name;
-            std::shared_ptr<Action> result = ActionFactory::Create(type_name);
-            result->serialize(archive);
+            std::shared_ptr<Action> result = ActionFactory::Create(archive);
             return result;
         }
     }
