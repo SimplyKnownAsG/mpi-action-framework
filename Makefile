@@ -78,7 +78,7 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 
 test: test_cpp test_py
 
-test_py: PY_TEST_FILES=$(sort $(call rwildcard, tests/, *.py))
+test_py: PY_TEST_FILES=$(sort $(call rwildcard, tests/ examples/, *.py))
 test_py: $(PY_EXT)
 	$(foreach pytestfile, $(PY_TEST_FILES), $(call colorecho,PYTHONPATH=. mpiexec -n 2 python $(pytestfile)))
 
@@ -90,10 +90,10 @@ $(PY_EXT): $(LIBMAF) $(BUILD_DIR)/maf/maf_wrap.obj
 	@# $< is repeated (implicit in $^) because the symbols are only needed after maf_wrap.obj
 	$(call colorecho,$(LDSHARED) $^ $<)
 
-test_cpp: $(sort $(patsubst %.cpp, %.exe, $(call rwildcard, tests/, *.cpp)))
+test_cpp: $(sort $(patsubst %.cpp, %.exe, $(call rwildcard, tests/ examples/, *.cpp)))
 	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 3 $(cpp_test_exec)))
 
-tests/%.exe: maf/maf.hpp $(BUILD_DIR)/tests/%.obj $(LIBMAF)
+%.exe: maf/maf.hpp $(BUILD_DIR)/%.obj $(LIBMAF)
 	$(call colorecho,$(LDEXE) $(filter-out maf/maf.hpp,$^))
 
 $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: maf.i maf/maf.hpp
