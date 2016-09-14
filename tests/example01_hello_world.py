@@ -2,6 +2,7 @@
 from mpi4py.MPI import COMM_WORLD
 import maf
 
+@maf.action
 class HelloWorldAction(maf.Action):
 
     def run(self):
@@ -15,8 +16,6 @@ class TestBcastController(maf.BcastController):
         self.bcast(act)
         act.run()
 
-
-maf.register(HelloWorldAction)
 
 controller = TestBcastController()
 controller.start()

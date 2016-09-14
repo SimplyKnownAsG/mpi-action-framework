@@ -67,31 +67,27 @@ public:
 int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
 
+    int exit_code = -1;
     try {
         // std::shared_ptr<ActionFactory> factory((ActionFactory*)(new TActionFactory<HelloWorldAction>("HelloWorldAction")));
         auto factory = std::shared_ptr<maf::ActionFactory>((maf::ActionFactory*)(new maf::TActionFactory<HelloWorldAction>("HelloWorldAction")));
         maf::ActionFactory::Register(factory);
 
-        MPI_Barrier(MPI_COMM_WORLD);
-        maf::mpi_print("===== TestBcastController controller;");
-        MPI_Barrier(MPI_COMM_WORLD);
+        maf::barrier("===== TestBcastController controller;");
 
         TestBcastController controller;
         controller.start();
 
-        MPI_Barrier(MPI_COMM_WORLD);
-        maf::mpi_print("===== maf::BcastController controller2(GetActions(3));");
-        MPI_Barrier(MPI_COMM_WORLD);
+        maf::barrier("===== maf::BcastController controller2(GetActions(3));");
 
         maf::BcastController controller2(GetActions(3));
         controller2.start();
 
-        MPI_Barrier(MPI_COMM_WORLD);
-        maf::mpi_print("===== maf::ScatterController controller3(GetActions(3));");
-        MPI_Barrier(MPI_COMM_WORLD);
+        maf::barrier("===== maf::ScatterController controller3(GetActions(3));");
 
         maf::ScatterController controller3(GetActions(3));
         controller3.start();
+        exit_code = 0;
     }
     catch (std::exception* ex) {
         maf::mpi_print("FAILED: ", ex->what());
@@ -101,4 +97,5 @@ int main(int argc, char* argv[]) {
     }
 
     MPI_Finalize();
+    return exit_code;
 }

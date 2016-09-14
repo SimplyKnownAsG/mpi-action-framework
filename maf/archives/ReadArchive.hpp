@@ -2,7 +2,6 @@
 
 #include "maf/archives/Archive.hpp"
 #include <sstream>
-#include "maf/Log.hpp"
 
 namespace maf {
 

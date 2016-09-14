@@ -67,34 +67,31 @@ namespace std {
 
 _FACTORY_REFRENCES = []
 
-_ACTION_STACK = []
+_ACTION_STACK = set()
 
 class Action(_maf.Action):
 
-    def tear_down(self):
-        _ACTION_STACK.pop()
+    def __init__(self):
+        _maf.Action.__init__(self)
+        _ACTION_STACK.add(self)
     
+    def __del__(self):
+        # when everything is getting cleaned up, it is possible that the _ACTION_STACK is None
+        if _ACTION_STACK is not None:
+            _ACTION_STACK.discard(self)
+
     def type_name(self):
         return self.__class__.__name__
 
-# thank you internet...
-# http://stackoverflow.com/questions/34445045/passing-python-functions-to-swig-wrapped-c-code
-def register(klass):
-    # import ctypes
-    # def callback():
-    #     instance = klass.__new__()
-    #     return instance.this
-    # c_func = ctypes.CFUNCTYPE(None)(callback)
-    # func_pointer = ctypes.cast(c_func, ctypes.c_void_p)
-    # Action.Register(klass.__name__, func_pointer)
+def action(klass):
     class PyActionFactory(ActionFactory):
         
         def create_action(self):
-            _ACTION_STACK.append(klass())
-            return _ACTION_STACK[-1]
+            return klass()
     
     factory = PyActionFactory(klass.__name__)
     ActionFactory.Register(factory)
     _FACTORY_REFRENCES.append(factory)
+    return klass
 
 %}
