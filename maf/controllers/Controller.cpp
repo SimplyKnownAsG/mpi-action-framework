@@ -21,6 +21,7 @@ namespace maf {
 
     void Controller::start(std::shared_ptr<Context> context) {
         this->context = context;
+        this->set_up();
 
         try {
             if (this->rank == 0) {
@@ -36,6 +37,8 @@ namespace maf {
         catch (std::shared_ptr<Action>& action) {
             // success
         }
+
+        this->tear_down();
     }
 
 }

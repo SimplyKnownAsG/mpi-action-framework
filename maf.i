@@ -49,9 +49,6 @@ namespace std {
 %feature("director") maf::Controller;
 %feature("director") maf::BcastController;
 %feature("director") maf::ScatterController;
-%feature("nodirector") maf::Controller::start;
-%feature("nodirector") maf::BcastController::start;
-%feature("nodirector") maf::ScatterController::start;
 %feature("nodirector") maf::Controller::scatter;
 %feature("nodirector") maf::BcastController::scatter;
 %feature("nodirector") maf::ScatterController::scatter;
