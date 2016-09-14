@@ -11,12 +11,13 @@ namespace maf {
     virtual void operator&(double &val) body; \
     virtual void operator&(std::string &val) string_body;
 
-// #define CREATE_OPERATOR_AMP_VECTOR(body) \
-//  virtual void operator&(std::vector<int> &val) body; \
-//  virtual void operator&(std::vector<long long> &val) body; \
-//  virtual void operator&(std::vector<float> &val) body; \
-//  virtual void operator&(std::vector<double> &val) body; \
-//  virtual void operator&(std::string &val) body; \
+    /* #define CREATE_OPERATOR_AMP_VECTOR(body) \
+     *  virtual void operator&(std::vector<int> &val) body; \
+     *  virtual void operator&(std::vector<long long> &val) body; \
+     *  virtual void operator&(std::vector<float> &val) body; \
+     *  virtual void operator&(std::vector<double> &val) body; \
+     *  virtual void operator&(std::string &val) body;
+     */
 
 #define CREATE_METHODS(method, body) \
     int method(int &val) body; \

@@ -5,7 +5,6 @@
 namespace maf {
 
     Action::Action() {
-        this->transmitted = false;
     }
 
     void Action::serialize(std::shared_ptr<Archive> archive) {

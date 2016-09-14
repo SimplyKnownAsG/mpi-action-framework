@@ -5,7 +5,7 @@
 
 namespace maf {
 
-    Controller::Controller() : Action(), rank(Mpi::GetRank()), size(Mpi::GetSize()), _queue() {
+    Controller::Controller() : Action(), _queue(), rank(Mpi::GetRank()), size(Mpi::GetSize()) {
 
     }
 

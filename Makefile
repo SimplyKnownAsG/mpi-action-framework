@@ -70,9 +70,9 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 	@echo '#include "maf/Version.hpp"' > $@
 	@echo '' >> $@
 	@echo 'namespace maf {' >> $@
-	@echo 'const std::string Version::git_sha1 = "'`git rev-parse HEAD`'";' >> $@
+	@echo '    const std::string Version::git_sha1 = "'`git rev-parse HEAD`'";' >> $@
 	@echo '' >> $@
-	@echo 'const std::string Version::git_description = "'`git describe --always --dirty`'";' >> $@
+	@echo '    const std::string Version::git_description = "'`git describe --always --dirty`'";' >> $@
 	@echo '}' >> $@
 	@echo "" >> $@
 
