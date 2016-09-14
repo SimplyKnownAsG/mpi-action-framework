@@ -29,6 +29,7 @@ namespace maf {
         int displacement = 0;
         std::shared_ptr<Archive> write_archive = std::shared_ptr<Archive>(new WriteArchive);
         size_t index = 0;
+
         for (auto action : actions) {
             displacements[index] = displacement;
             std::string type_name = action->type_name();
@@ -38,6 +39,7 @@ namespace maf {
             send_counts[index++] = current_disp - displacement;
             displacement = current_disp;
         }
+
         std::string content = write_archive->str();
         const char* send_buffer = content.c_str();
         int recv_count;
@@ -51,16 +53,18 @@ namespace maf {
         std::string s(recv_buffer, recv_count);
         std::shared_ptr<Archive> read_archive = std::shared_ptr<Archive>(new ReadArchive(s));
         auto action = ActionFactory::Create(read_archive);
-        action->start();
+        action->start(this->context);
     }
 
     void ScatterController::run() {
         while (!this->_queue.empty()) {
             std::vector<std::shared_ptr<Action>> actions;
+
             for (int rank = 0; rank < this->size; rank++) {
                 actions.push_back(this->_queue.front());
                 this->_queue.pop();
             }
+
             this->scatter(actions);
         }
     }

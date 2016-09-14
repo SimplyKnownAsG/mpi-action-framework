@@ -36,7 +36,7 @@ namespace maf {
         Archive() {
         };
 
-        CREATE_OPERATOR_AMP(= 0, = 0);
+        CREATE_OPERATOR_AMP( = 0, = 0);
 
         // CREATE_OPERATOR_AMP_VECTOR(= 0);
 
@@ -60,7 +60,7 @@ namespace maf {
             RW_BODY()
         };
 
-        virtual void bcast(int root=0) = 0;
+        virtual void bcast(int root = 0) = 0;
 
         virtual std::string str() = 0;
 

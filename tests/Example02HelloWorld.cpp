@@ -47,9 +47,11 @@ public:
 
 static std::vector<std::shared_ptr<maf::Action>> GetActions(int action_count) {
     std::vector<std::shared_ptr<maf::Action>> actions;
+
     for (int ii = 0; ii < action_count; ii++) {
         actions.push_back(std::shared_ptr<maf::Action>(new HelloWorldAction(std::string(ii, 's'), 2 * ii, 3.3 * ii, 4.4 * ii * ii)));
     }
+
     return actions;
 }
 
@@ -60,6 +62,7 @@ public:
         for (auto action : GetActions(3)) {
             this->bcast(action);
         }
+
         this->bcast(GetActions(3));
     };
 };
@@ -68,6 +71,7 @@ int main(int argc, char* argv[]) {
     MPI_Init(&argc, &argv);
 
     int exit_code = -1;
+
     try {
         // std::shared_ptr<ActionFactory> factory((ActionFactory*)(new TActionFactory<HelloWorldAction>("HelloWorldAction")));
         auto factory = std::shared_ptr<maf::ActionFactory>((maf::ActionFactory*)(new maf::TActionFactory<HelloWorldAction>("HelloWorldAction")));

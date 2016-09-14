@@ -5,3 +5,6 @@
 --convert-tabs
 --align-pointer=type
 --close-templates
+--break-blocks
+--pad-oper
+--pad-header

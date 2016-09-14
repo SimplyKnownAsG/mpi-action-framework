@@ -8,10 +8,12 @@ namespace maf {
         std::ostringstream stream;
         stream << std::endl
                << "  " << typeid(*ex).name();
+
         while (std::getline(inner_message, line)) {
             stream << std::endl
                    << "  " << line;
         }
+
         stream << std::endl
                << "  " << line;
         this->_message += stream.str();
