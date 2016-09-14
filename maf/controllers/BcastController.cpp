@@ -29,7 +29,8 @@ namespace maf {
             archive->bcast();
             action = ActionFactory::Create(archive);
         }
-        action->start();
+
+        action->start(this->context);
     }
 
     void BcastController::bcast(std::vector<std::shared_ptr<Action>> actions) {
@@ -61,7 +62,7 @@ namespace maf {
     void BcastController::_stop() {
         auto act = ActionFactory::Create("EndLoopAction");
         this->bcast(act);
-        act->start(); // throws an EndLoopAction exception to successfully terminate .start()
+        act->start(this->context); // throws an EndLoopAction exception to successfully terminate .start()
     }
 
 }

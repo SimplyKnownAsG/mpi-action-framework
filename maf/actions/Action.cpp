@@ -4,7 +4,10 @@
 
 namespace maf {
 
-    Action::Action() {
+    Action::Action() : context(NULL) {
+    }
+
+    Action::~Action() {
     }
 
     void Action::serialize(std::shared_ptr<Archive> archive) {
@@ -15,7 +18,8 @@ namespace maf {
         return;
     }
 
-    void Action::start() {
+    void Action::start(std::shared_ptr<Context> context) {
+        this->context = context;
         this->run();
         this->tear_down();
     }

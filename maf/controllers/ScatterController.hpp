@@ -10,7 +10,7 @@ namespace maf {
 
         ScatterController(std::vector<std::shared_ptr<Action>> actions);
 
-        void bcast(std::shared_ptr<Action> action=NULL) override;
+        void bcast(std::shared_ptr<Action> action = NULL) override;
 
         void bcast(std::vector<std::shared_ptr<Action>> actions) override;
 

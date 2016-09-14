@@ -5,7 +5,7 @@
 
 namespace maf {
 
-    Controller::Controller() : Action(), _queue(), rank(Mpi::GetRank()), size(Mpi::GetSize()) {
+    Controller::Controller() : Action(), _queue(), rank(Mpi::GetRank()), size(Mpi::GetSize()), context() {
 
     }
 
@@ -19,7 +19,9 @@ namespace maf {
         return;
     }
 
-    void Controller::start() {
+    void Controller::start(std::shared_ptr<Context> context) {
+        this->context = context;
+
         try {
             if (this->rank == 0) {
                 this->run();

@@ -14,7 +14,6 @@ class TestBcastController(maf.BcastController):
     def run(self):
         act = HelloWorldAction()
         self.bcast(act)
-        act.run()
 
 
 controller = TestBcastController()

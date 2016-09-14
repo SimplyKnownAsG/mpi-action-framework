@@ -1,6 +1,7 @@
 #pragma once
 
 #include "maf/archives/Archive.hpp"
+#include "maf/Context.hpp"
 
 #include <unordered_map>
 #include <memory>
@@ -12,14 +13,15 @@ namespace maf {
 
     public:
 
+        std::shared_ptr<Context> context;
+
         Action();
 
-        virtual ~Action() {
-        };
+        virtual ~Action();
 
         virtual void run() = 0;
 
-        virtual void start();
+        virtual void start(std::shared_ptr<Context> context = NULL);
 
         virtual void serialize(std::shared_ptr<Archive> archive);
 

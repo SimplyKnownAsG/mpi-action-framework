@@ -20,9 +20,11 @@ namespace maf {
 
     std::vector<std::string> ActionFactory::Names() {
         std::vector<std::string> names;
+
         for (auto key_val : ActionFactory::factories) {
             names.push_back(key_val.first);
         }
+
         return names;
     }
 
@@ -59,6 +61,7 @@ namespace maf {
 
     void ActionFactory::Register(std::shared_ptr<ActionFactory> factory) {
         auto name = factory->action_name;
+
         try {
             auto func = ActionFactory::factories.at(name);
             std::ostringstream msg;

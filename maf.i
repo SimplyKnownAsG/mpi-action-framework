@@ -33,6 +33,8 @@ namespace std {
     }
 };
 
+%feature("director") maf::Context;
+%shared_ptr(maf::Context);
 %feature("director") maf::Action;
 %feature("nodirector") maf::Action::start;
 %shared_ptr(maf::Action);
