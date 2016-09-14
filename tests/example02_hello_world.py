@@ -7,7 +7,8 @@ import sys
 import cPickle
 import timeit
 
-class HelloWorldAction(maf.Action):
+@maf.action
+class MafSerializer(maf.Action):
 
     def __init__(self, my_string='Hello World!', my_int=0, my_float=0.0):
         maf.Action.__init__(self)
@@ -24,7 +25,8 @@ class HelloWorldAction(maf.Action):
         self.my_float = archive.rw_double(self.my_float)
 
 
-class PickleSerialer(HelloWorldAction):
+@maf.action
+class PickleSerialer(MafSerializer):
 
     def serialize(self, archive):
         data = dict(self.__dict__)
@@ -43,27 +45,27 @@ class TestBcastController(maf.BcastController):
 
     def run(self):
         act = self.action_class()
-        self.bcast(act).run()
+        self.bcast(act)
         act2 = self.action_class('Whatever', 2, 44)
-        self.bcast(act2).run()
+        self.bcast(act2)
         act = self.action_class('The final act!', sys.maxint, sys.float_info.max)
-        self.bcast(act).run()
+        self.bcast(act)
 
-
-maf.register(HelloWorldAction)
-maf.register(PickleSerialer)
+maf.barrier('==== Starting tests with MafSerializer')
 
 start = timeit.default_timer()
-controller = TestBcastController(HelloWorldAction)
+controller = TestBcastController(MafSerializer)
 controller.start()
 serializer_time = timeit.default_timer() - start
 
-COMM_WORLD.Barrier()
+maf.barrier('==== Starting tests with PickleSerializer')
 
 start = timeit.default_timer()
 controller = TestBcastController(PickleSerialer)
 controller.start()
 pickle_time = timeit.default_timer() - start
+
+maf.barrier('==== Done with tests')
 
 maf.log('SERIALIZE time: {}\n'
     '    PICKLE time   : {}'.format(serializer_time, pickle_time))

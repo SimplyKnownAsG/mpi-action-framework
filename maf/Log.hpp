@@ -27,4 +27,5 @@ namespace maf {
 
     void log(std::string msg);
 
+    void barrier(std::string msg);
 }
