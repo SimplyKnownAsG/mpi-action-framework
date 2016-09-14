@@ -28,8 +28,6 @@ namespace maf {
             this->_stream.read((char*)(&val[0]), size);
         });
 
-        void bcast(int root = 0);
-
         std::string str() override;
 
         size_t length() override;

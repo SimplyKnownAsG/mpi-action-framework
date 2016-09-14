@@ -17,16 +17,23 @@ namespace maf {
     }
 
     void BcastController::bcast(std::shared_ptr<Action> action) {
+        std::string data;
+
         if (action) {
             std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new WriteArchive);
             std::string type_name = action->type_name();
             (*archive) & type_name;
             action->serialize(archive);
-            archive->bcast();
+            data = archive->str();
         }
-        else {
-            std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new ReadArchive);
-            archive->bcast();
+
+        int size = data.size();
+        MPI_Bcast(&size, sizeof(size), MPI_INT, 0, MPI_COMM_WORLD);
+        data.resize(size);
+        MPI_Bcast((void*)data.data(), size * sizeof(char), MPI_CHAR, 0, MPI_COMM_WORLD);
+
+        if (!action) {
+            std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new ReadArchive(data));
             action = ActionFactory::Create(archive);
         }
 
