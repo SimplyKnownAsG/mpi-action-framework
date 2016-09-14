@@ -34,7 +34,7 @@ namespace std {
 };
 
 %feature("director") maf::Action;
-%feature("director") maf::Action::start;
+%feature("nodirector") maf::Action::start;
 %shared_ptr(maf::Action);
 %template(ActionVector) std::vector<std::shared_ptr<maf::Action>>;
 %shared_ptr(maf::Exception);
@@ -47,6 +47,9 @@ namespace std {
 %feature("director") maf::Controller;
 %feature("director") maf::BcastController;
 %feature("director") maf::ScatterController;
+%feature("nodirector") maf::Controller::start;
+%feature("nodirector") maf::BcastController::start;
+%feature("nodirector") maf::ScatterController::start;
 %feature("nodirector") maf::Controller::scatter;
 %feature("nodirector") maf::BcastController::scatter;
 %feature("nodirector") maf::ScatterController::scatter;

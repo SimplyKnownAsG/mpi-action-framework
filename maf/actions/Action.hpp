@@ -10,9 +10,6 @@ namespace maf {
 
     class Action : public std::enable_shared_from_this<Action> {
 
-    private:
-        bool transmitted;
-
     public:
 
         Action();
