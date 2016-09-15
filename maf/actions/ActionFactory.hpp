@@ -7,6 +7,7 @@
 #include <vector>
 
 namespace maf {
+
     class ActionFactory {
     private:
         static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> factories;
@@ -42,4 +43,10 @@ namespace maf {
             return std::shared_ptr<Action>((Action*)new TAction);
         };
     };
+
+#define MAF_ACTION(action_type) \
+    class action_type; \
+    bool action_type## _is_registerd = maf::ActionFactory::Register<action_type>(#action_type); \
+    class action_type : public maf::Action
+
 }
