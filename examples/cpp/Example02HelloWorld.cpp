@@ -23,12 +23,12 @@ public:
     };
 
     void run() {
-        maf::mpi_print("Hello World! (from c++)",
-                       "     my_string: `", this->my_string,
-                       "`     my_int: `", this->my_int,
-                       "`     my_float: `", this->my_float,
-                       "`     my_double: `", this->my_double, "`"
-                      );
+        maf::log("Hello World! (from c++)",
+                 "     my_string: `", this->my_string,
+                 "`     my_int: `", this->my_int,
+                 "`     my_float: `", this->my_float,
+                 "`     my_double: `", this->my_double, "`"
+                );
     };
 
     void serialize(std::shared_ptr<maf::Archive> archive) {
@@ -68,8 +68,6 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    MPI_Init(&argc, &argv);
-
     int exit_code = -1;
 
     try {
@@ -94,10 +92,10 @@ int main(int argc, char* argv[]) {
         exit_code = 0;
     }
     catch (std::exception* ex) {
-        maf::mpi_print("FAILED: ", ex->what());
+        maf::log("FAILED: ", ex->what());
     }
     catch (...) {
-        maf::mpi_print("FAILED: no idea what happened");
+        maf::log("FAILED: no idea what happened");
     }
 
     MPI_Finalize();

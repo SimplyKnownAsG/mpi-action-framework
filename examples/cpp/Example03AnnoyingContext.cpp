@@ -12,10 +12,10 @@ public:
 
     void annoy() {
         if (++this->annoyance_count > 2) {
-            maf::mpi_print("Ugh, so annoyed!!! ", annoyance_count);
+            maf::log("Ugh, so annoyed!!! ", annoyance_count);
         }
         else {
-            maf::mpi_print("Nope, not annoyed... ", annoyance_count);
+            maf::log("Nope, not annoyed... ", annoyance_count);
         }
     };
 
@@ -27,7 +27,7 @@ class AnnoyAction : public maf::Action {
 public:
 
     void run() override {
-        maf::mpi_print("Are you annoyed yet?");
+        maf::log("Are you annoyed yet?");
         this->context->as<AnnoyContext>()->annoy();
     };
 
@@ -39,8 +39,6 @@ public:
 
 
 int main(int argc, char* argv[]) {
-    MPI_Init(&argc, &argv);
-
     int exit_code = -1;
 
     try {
@@ -56,10 +54,10 @@ int main(int argc, char* argv[]) {
         exit_code = 0;
     }
     catch (std::exception* ex) {
-        maf::mpi_print("FAILED: ", ex->what());
+        maf::log("FAILED: ", ex->what());
     }
     catch (...) {
-        maf::mpi_print("FAILED: no idea what happened");
+        maf::log("FAILED: no idea what happened");
     }
 
     MPI_Finalize();

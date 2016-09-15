@@ -4,6 +4,10 @@
 #include "maf/archives/ReadArchive.hpp"
 #include "maf/archives/WriteArchive.hpp"
 #include "maf/actions/ActionFactory.hpp"
+#include "maf/actions/SplitMpiAction.hpp"
+#include "maf/actions/EmptyAction.hpp"
+
+#include "maf/Log.hpp"
 
 namespace maf {
 
@@ -24,49 +28,75 @@ namespace maf {
     }
 
     void ScatterController::scatter(std::vector<std::shared_ptr<Action>> actions) {
-        std::vector<int> send_counts(this->size);
-        std::vector<int> displacements(this->size);
-        int displacement = 0;
-        std::shared_ptr<Archive> write_archive = std::shared_ptr<Archive>(new WriteArchive);
-        size_t index = 0;
-
-        for (auto action : actions) {
-            displacements[index] = displacement;
-            std::string type_name = action->type_name();
-            (*write_archive) & type_name;
-            action->serialize(write_archive);
-            int current_disp = write_archive->length();
-            send_counts[index++] = current_disp - displacement;
-            displacement = current_disp;
+        if (this->rank == 0) {
+            this->_populate_queue(actions);
         }
 
-        std::string content = write_archive->str();
-        const char* send_buffer = content.c_str();
-        int recv_count;
-        MPI_Scatter((void*)(send_counts.data()), 1, MPI_INT,
-                    (void*)&recv_count, 1, MPI_INT,
-                    0, MPI_COMM_WORLD);
-        char* recv_buffer = new char[recv_count];
-        MPI_Scatterv((void*)send_buffer, send_counts.data(), displacements.data(), MPI_CHAR,
-                     (void*)recv_buffer, recv_count, MPI_CHAR,
-                     0, MPI_COMM_WORLD);
-        std::string s(recv_buffer, recv_count);
-        std::shared_ptr<Archive> read_archive = std::shared_ptr<Archive>(new ReadArchive(s));
-        auto action = ActionFactory::Create(read_archive);
-        action->start(this->context);
+        do {
+            std::vector<int> send_counts(this->size);
+            std::vector<int> displacements(this->size);
+            int displacement = 0;
+            std::shared_ptr<Archive> write_archive = std::shared_ptr<Archive>(new WriteArchive);
+            size_t index = 0;
+
+            if (this->rank == 0) {
+                if (this->_queue.size() < this->size) {
+                    int num_actions = this->_queue.size();
+
+                    for (int rank = 0; rank < this->size; rank++) {
+                        std::shared_ptr<Action> action(new SplitMpiAction(rank <= num_actions));
+                        displacements[index] = displacement;
+                        std::string type_name = action->type_name();
+                        (*write_archive) & type_name;
+                        action->serialize(write_archive);
+                        int current_disp = write_archive->length();
+                        send_counts[index++] = current_disp - displacement;
+                        displacement = current_disp;
+                    }
+                }
+
+                for (int rank = 0; rank < this->size; rank++) {
+                    std::shared_ptr<Action> action;
+
+                    if (this->_queue.empty()) {
+                        action = std::shared_ptr<Action>(new EmptyAction);
+                    }
+                    else {
+                        action = this->_queue.front();
+                        this->_queue.pop();
+                    }
+
+                    displacements[index] = displacement;
+                    std::string type_name = action->type_name();
+                    (*write_archive) & type_name;
+                    action->serialize(write_archive);
+                    int current_disp = write_archive->length();
+                    send_counts[index++] = current_disp - displacement;
+                    displacement = current_disp;
+                }
+            }
+
+            std::string content = write_archive->str();
+            const char* send_buffer = content.c_str();
+            int recv_count;
+            MPI_Scatter((void*)(send_counts.data()), 1, MPI_INT,
+                        (void*)&recv_count, 1, MPI_INT,
+                        0, MPI_COMM_WORLD);
+            char* recv_buffer = new char[recv_count];
+            MPI_Scatterv((void*)send_buffer, send_counts.data(), displacements.data(), MPI_CHAR,
+                         (void*)recv_buffer, recv_count, MPI_CHAR,
+                         0, MPI_COMM_WORLD);
+            std::string s(recv_buffer, recv_count);
+            std::shared_ptr<Archive> read_archive = std::shared_ptr<Archive>(new ReadArchive(s));
+            auto action = ActionFactory::Create(read_archive);
+            action->start(this->context);
+        }
+        while (!this->_queue.empty());
     }
 
     void ScatterController::run() {
-        while (!this->_queue.empty()) {
-            std::vector<std::shared_ptr<Action>> actions;
-
-            for (int rank = 0; rank < this->size; rank++) {
-                actions.push_back(this->_queue.front());
-                this->_queue.pop();
-            }
-
-            this->scatter(actions);
-        }
+        std::vector<std::shared_ptr<Action>> actions; // pass empty and just use the existing queue
+        this->scatter(actions);
     }
 
     std::string ScatterController::type_name() {

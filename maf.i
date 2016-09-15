@@ -41,6 +41,7 @@ namespace std {
 %template(ActionVector) std::vector<std::shared_ptr<maf::Action>>;
 %shared_ptr(maf::Exception);
 %shared_ptr(maf::EndLoopAction);
+%shared_ptr(maf::EmptyAction);
 %feature("director") maf::ActionFactory;
 %shared_ptr(maf::ActionFactory);
 %shared_ptr(maf::Controller);
@@ -60,6 +61,10 @@ namespace std {
 %shared_ptr(maf::WriteArchive);
 
 %include "maf/maf.hpp"
+
+%template(log) maf::log<std::string>;
+%template(warning) maf::warning<std::string>;
+%template(barrier) maf::barrier<std::string>;
 
 
 %pythoncode %{

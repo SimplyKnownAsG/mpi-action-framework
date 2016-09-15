@@ -1,5 +1,6 @@
 #include "maf/actions/ActionFactory.hpp"
 #include "maf/actions/EndLoopAction.hpp"
+#include "maf/actions/EmptyAction.hpp"
 #include "maf/controllers/ScatterController.hpp"
 #include "maf/controllers/BcastController.hpp"
 
@@ -10,9 +11,11 @@ namespace maf {
         auto end_loop = std::shared_ptr<ActionFactory>(new TActionFactory<EndLoopAction>("EndLoopAction"));
         auto scatter = std::shared_ptr<ActionFactory>(new TActionFactory<ScatterController>("ScatterController"));
         auto bcast = std::shared_ptr<ActionFactory>(new TActionFactory<BcastController>("BcastController"));
+        auto empty = std::shared_ptr<ActionFactory>(new TActionFactory<EmptyAction>("EmptyAction"));
         factories[end_loop->action_name] = end_loop;
         factories[scatter->action_name] = scatter;
         factories[bcast->action_name] = bcast;
+        factories[empty->action_name] = empty;
         return factories;
     }
 
