@@ -29,6 +29,10 @@ namespace maf {
 
     }
 
+    std::shared_ptr<MafComm> MafComm::split(int color) {
+        return this->shared_from_this();
+    }
+
     void MafComm::take_over_the_world() {
         MafComm::World = this->shared_from_this();
         MafComm::WorldComm = this->communicator;
@@ -36,5 +40,19 @@ namespace maf {
 
     void MafComm::barrier() {
         MPI_Barrier(this->communicator);
+    }
+
+    std::string MafComm::bcast(const std::string& msg, int root) {
+        int size = msg.size();
+        MPI_Bcast((void*)&size, sizeof(size), MPI_INT, root, this->communicator);
+        if (this->rank == root) {
+            MPI_Bcast((void*)msg.data(), size, MPI_CHAR, root, this->communicator);
+            return msg;
+        }
+        else {
+            std::string buffer = std::string(size, ' ');
+            MPI_Bcast((void*)buffer.data(), size, MPI_CHAR, root, this->communicator);
+            return buffer;
+        }
     }
 }

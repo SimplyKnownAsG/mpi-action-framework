@@ -21,6 +21,10 @@ namespace std {
         std::ostringstream full_msg;
         full_msg <<  typeid(ex).name() << " in $decl: " << ex->what();
         SWIG_exception(SWIG_RuntimeError, full_msg.str().c_str());
+    } catch(std::exception& ex) {
+        std::ostringstream full_msg;
+        full_msg <<  typeid(ex).name() << " in $decl: " << ex.what();
+        SWIG_exception(SWIG_RuntimeError, full_msg.str().c_str());
     } catch(std::exception *ex) {
         std::ostringstream full_msg;
         full_msg <<  typeid(ex).name() << " in $decl: " << ex->what();
@@ -37,11 +41,13 @@ namespace std {
 %shared_ptr(maf::Context);
 %feature("director") maf::Action;
 %feature("nodirector") maf::Action::start;
+%shared_ptr(maf::MafComm);
 %shared_ptr(maf::Action);
 %template(ActionVector) std::vector<std::shared_ptr<maf::Action>>;
 %shared_ptr(maf::Exception);
 %shared_ptr(maf::EndLoopAction);
 %shared_ptr(maf::EmptyAction);
+%shared_ptr(maf::SplitMpiAction);
 %feature("director") maf::ActionFactory;
 %shared_ptr(maf::ActionFactory);
 %shared_ptr(maf::Controller);
@@ -59,6 +65,8 @@ namespace std {
 %shared_ptr(maf::Archive);
 %shared_ptr(maf::ReadArchive);
 %shared_ptr(maf::WriteArchive);
+
+
 
 %include "maf/maf.hpp"
 

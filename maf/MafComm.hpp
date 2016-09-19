@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include "mpi.h"
 
 namespace maf {
@@ -43,6 +44,8 @@ namespace maf {
         void take_over_the_world();
 
         void barrier();
+
+        std::string bcast(const std::string& msg, int root=0);
     };
 
 }

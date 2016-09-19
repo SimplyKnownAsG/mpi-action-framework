@@ -65,6 +65,9 @@ debug: test
 
 clean:
 	-$(RM) -r ./debug/ ./release/
+	-$(RM) ./maf/*wrap*
+
+clobber: clean
 	-git clean -fx
 
 maf/maf.hpp: $(HEADERS)
@@ -94,6 +97,7 @@ $(LIBMAF): $(OBJ)
 
 $(PY_EXT): $(LIBMAF) $(OBJ_DIR)/maf/maf_wrap.obj
 	@# $< is repeated (implicit in $^) because the symbols are only needed after maf_wrap.obj
+	$(mkdirs)
 	$(call colorecho,$(LDSHARED) $^ $<)
 
 test_cpp: $(sort $(patsubst %.cpp, $(BIN_DIR)/%.exe, $(call rwildcard, tests examples, *.cpp)))

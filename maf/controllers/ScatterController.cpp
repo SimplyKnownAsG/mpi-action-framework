@@ -77,17 +77,15 @@ namespace maf {
             }
 
             std::string content = write_archive->str();
-            const char* send_buffer = content.c_str();
             int recv_count;
             MPI_Scatter((void*)(send_counts.data()), 1, MPI_INT,
                         (void*)&recv_count, 1, MPI_INT,
                         0, MPI_COMM_WORLD);
-            char* recv_buffer = new char[recv_count];
-            MPI_Scatterv((void*)send_buffer, send_counts.data(), displacements.data(), MPI_CHAR,
-                         (void*)recv_buffer, recv_count, MPI_CHAR,
+            std::string recv_buffer = std::string(recv_count, ' ');
+            MPI_Scatterv((void*)content.data(), send_counts.data(), displacements.data(), MPI_CHAR,
+                         (void*)recv_buffer.data(), recv_count, MPI_CHAR,
                          0, MPI_COMM_WORLD);
-            std::string s(recv_buffer, recv_count);
-            std::shared_ptr<Archive> read_archive = std::shared_ptr<Archive>(new ReadArchive(s));
+            std::shared_ptr<Archive> read_archive = std::shared_ptr<Archive>(new ReadArchive(recv_buffer));
             auto action = ActionFactory::Create(read_archive);
             action->start(this->context);
         }
