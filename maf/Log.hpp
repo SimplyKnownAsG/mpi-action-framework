@@ -3,7 +3,8 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include "maf/Mpi.hpp"
+#include "maf/MafComm.hpp"
+
 
 namespace maf {
 
@@ -19,13 +20,30 @@ namespace maf {
     };
 
     template<typename... TArgs>
-    void mpi_print(TArgs... args) {
+    void log(TArgs... args) {
         std::ostringstream msg;
         flatten(msg, args...);
-        std::cout << "[" << Mpi::GetRank() << "] " << msg.str() << std::endl;
+        std::cout << "[maf::message::" << MafComm::World->rank << "] " << msg.str() << std::endl;
     };
 
-    void log(std::string msg);
+    template<typename... TArgs>
+    void warning(TArgs... args) {
+        std::ostringstream msg;
+        flatten(msg, args...);
+        std::cout << "[maf::warning::" << MafComm::World->rank << "] " << msg.str() << std::endl;
+    };
 
-    void barrier(std::string msg);
+    template<typename... TArgs>
+    void barrier(TArgs... args) {
+        MafComm::World->barrier();
+
+        if (MafComm::World->rank == 0) {
+            std::ostringstream msg;
+            flatten(msg, args...);
+            std::cout << "[maf::barrier::" << MafComm::World->rank << "] " << msg.str() << std::endl;
+        }
+
+        MafComm::World->barrier();
+    };
+
 }
