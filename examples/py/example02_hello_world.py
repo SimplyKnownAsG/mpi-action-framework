@@ -1,10 +1,11 @@
 '''test functionality in Python'''
-import maf
-
 from mpi4py.MPI import COMM_WORLD # this lets mpi4py handle MPI_Init and MPI_Finalize
+
+import maf
 
 import sys
 import cPickle
+import marshal
 import timeit
 
 @maf.action
@@ -37,6 +38,18 @@ class PickleSerialer(MafSerializer):
         self.__dict__.update(cPickle.loads(string))
 
 
+@maf.action
+class MarshalSerialer(MafSerializer):
+
+    def serialize(self, archive):
+        data = dict(self.__dict__)
+        if 'this' in data:
+            del data['this'] # don't pickle the SWIG object
+        string = marshal.dumps(data)
+        string = archive.rw_string(string)
+        self.__dict__.update(marshal.loads(string))
+
+
 class TestBcastController(maf.BcastController):
     
     def __init__(self, action_class):
@@ -65,7 +78,16 @@ controller = TestBcastController(PickleSerialer)
 controller.start()
 pickle_time = timeit.default_timer() - start
 
+maf.barrier('==== Starting tests with MarshalSerializer')
+
+start = timeit.default_timer()
+controller = TestBcastController(MarshalSerialer)
+controller.start()
+marshal_time = timeit.default_timer() - start
+
 maf.barrier('==== Done with tests')
 
-maf.log('SERIALIZE time: {}\n'
-    '    PICKLE time   : {}'.format(serializer_time, pickle_time))
+maf.log(              'SERIALIZE time: {}\n'
+    '                  PICKLE time   : {}\n'
+    '                  MARSHAL time  : {}'
+    .format(serializer_time, pickle_time, marshal_time))
