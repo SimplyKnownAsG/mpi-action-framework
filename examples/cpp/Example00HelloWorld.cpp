@@ -12,7 +12,7 @@ public:
     };
 
     void run() {
-        maf::mpi_print("Hello World! (from c++)");
+        maf::log("Hello World! (from c++)");
     };
 
     std::string type_name() {
@@ -22,7 +22,6 @@ public:
 };
 
 int main(int argc, char* argv[]) {
-    MPI_Init(&argc, &argv);
 
     try {
         // std::shared_ptr<ActionFactory> factory((ActionFactory*)(new TActionFactory<HelloWorldAction>("HelloWorldAction")));
@@ -35,11 +34,11 @@ int main(int argc, char* argv[]) {
         controller.start();
     }
     catch (std::exception* ex) {
-        maf::mpi_print("FAILED: ", ex->what());
+        maf::log("FAILED: ", ex->what());
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
     catch (...) {
-        maf::mpi_print("FAILED: no idea what happened");
+        maf::log("FAILED: no idea what happened");
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
 

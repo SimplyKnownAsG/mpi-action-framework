@@ -13,11 +13,13 @@ namespace maf {
 
         std::queue<std::shared_ptr<Action>> _queue;
 
+        void _populate_queue(std::vector<std::shared_ptr<Action>>& queue);
+
     public:
 
-        const int rank;
+        int rank;
 
-        const int size;
+        int size;
 
         std::shared_ptr<Context> context;
 
