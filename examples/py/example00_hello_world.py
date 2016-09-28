@@ -9,4 +9,5 @@ class HelloWorldAction(maf.Action):
         maf.log('Hello World! (from Python) there are {} actions in the stack'.format(len(maf._ACTION_STACK)))
 
 controller = maf.BcastController([HelloWorldAction()])
+maf.log('ActionFactory.Names: {}'.format(maf.ActionFactory.Names()))
 controller.start()

@@ -5,12 +5,23 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace maf {
 
+    template<class TAction>
+    class TActionFactory;
+
     class ActionFactory {
     private:
+
+        static bool _initialized;
+
+        static void _initialize();
+
         static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> factories;
+
+        static std::vector<std::shared_ptr<ActionFactory>> tests;
 
     public:
 
@@ -21,6 +32,17 @@ namespace maf {
         static std::vector<std::string> Names();
 
         static void Register(std::shared_ptr<ActionFactory> factory);
+
+        template <class TAction>
+        static bool Register(bool is_test=false) {
+            std::string action_name = typeid(TAction).name();
+            auto factory = std::shared_ptr<ActionFactory>(new TActionFactory<TAction>(action_name));
+            ActionFactory::Register(factory);
+            if (is_test) {
+                ActionFactory::tests.push_back(factory);
+            }
+            return true;
+        };
 
         const std::string action_name;
 
@@ -46,7 +68,7 @@ namespace maf {
 
 #define MAF_ACTION(action_type) \
     class action_type; \
-    bool action_type## _is_registerd = maf::ActionFactory::Register<action_type>(#action_type); \
+    bool action_type## _is_registerd = maf::ActionFactory::Register<action_type>(); \
     class action_type : public maf::Action
 
 }

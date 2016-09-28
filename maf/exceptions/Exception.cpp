@@ -1,5 +1,6 @@
 #include "maf/exceptions/Exception.hpp"
 
+
 namespace maf {
 
     void Exception::update_message(std::exception* ex) {

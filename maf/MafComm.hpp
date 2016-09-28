@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 #include "mpi.h"
 
 namespace maf {
@@ -43,9 +44,42 @@ namespace maf {
          */
         void take_over_the_world();
 
+        void abort(int exit_code = -1);
+
         void barrier();
 
-        std::string bcast(const std::string& msg, int root=0);
+        template<class T>
+        T bcast(const T& msg, int root = 0) {
+            if (this->rank == root) {
+                MPI_Bcast((void*)&msg, sizeof(T), MPI_CHAR, root, this->communicator);
+                return msg;
+            }
+            else {
+                T buffer;
+                MPI_Bcast((void*)&buffer, sizeof(T), MPI_CHAR, root, this->communicator);
+                return buffer;
+            }
+        };
+
+        // template<class T>
+        // std::vector<T> bcast(const std::vector<T>& msg, int root=0) {
+        //     int size = msg.size();
+        //     MPI_Bcast((void*)&size, sizeof(size), MPI_INT, root, this->communicator);
+
+        //     if (this->rank == root) {
+        //         MPI_Bcast((void*)msg.data(), size, MPI_CHAR, root, this->communicator);
+        //         return msg;
+        //     }
+        //     else {
+        //         std::vector<T> buffer(size);
+        //         MPI_Bcast((void*)buffer.data(), size, MPI_CHAR, root, this->communicator);
+        //         return buffer;
+        //     }
+        // };
+
     };
+
+    template<>
+    std::string MafComm::bcast<std::string>(const std::string& msg, int root);
 
 }
