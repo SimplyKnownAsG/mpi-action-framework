@@ -46,15 +46,16 @@ int main(int argc, char* argv[]) {
 
         // run scatter contrller with MPI_SIZE + 1 actions
         actions.push_back(maf::ActionFactory::Create("IncrementContextAction"));
+        maf::barrier("=== scattering ", actions.size(), " actions");
         maf::ScatterController uneven_controller(actions);
         uneven_controller.start(std::shared_ptr<maf::Context>(new CounterContext));
         actions.pop_back();
-        maf::barrier("=== scattering ", actions.size(), "actions");
+        maf::barrier("=== scattering ", actions.size(), " actions");
         uneven_controller.scatter(actions);
         exit_code = 0;
     }
     catch (std::exception* ex) {
-        maf::log("FAILED: ", ex->what());
+        maf::log("FAILED: *", ex->what());
     }
     catch (...) {
         maf::log("FAILED: no idea what happened");

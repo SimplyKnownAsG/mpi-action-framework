@@ -41,8 +41,10 @@ namespace std {
 %shared_ptr(maf::Context);
 %feature("director") maf::Action;
 %feature("nodirector") maf::Action::start;
-%shared_ptr(maf::MafComm);
 %shared_ptr(maf::Action);
+%feature("director") maf::AbstractTestAction;
+%shared_ptr(maf::AbstractTestAction);
+%shared_ptr(maf::MafComm);
 %template(ActionVector) std::vector<std::shared_ptr<maf::Action>>;
 %shared_ptr(maf::Exception);
 %shared_ptr(maf::EndLoopAction);
@@ -50,6 +52,7 @@ namespace std {
 %shared_ptr(maf::SplitMpiAction);
 %feature("director") maf::ActionFactory;
 %shared_ptr(maf::ActionFactory);
+
 %shared_ptr(maf::Controller);
 %shared_ptr(maf::BcastController);
 %shared_ptr(maf::ScatterController);
@@ -66,27 +69,65 @@ namespace std {
 %shared_ptr(maf::ReadArchive);
 %shared_ptr(maf::WriteArchive);
 
-
-
 %include "maf/maf.hpp"
 
 %template(log) maf::log<std::string>;
 %template(warning) maf::warning<std::string>;
 %template(barrier) maf::barrier<std::string>;
 
+%template(bcast) maf::MafComm::bcast<std::string>;
+%template(bcast) maf::MafComm::bcast<int>;
+%template(bcast) maf::MafComm::bcast<long long>;
+%template(bcast) maf::MafComm::bcast<double>;
+%template(bcast) maf::MafComm::bcast<float>;
+
+%template(assert_equal) maf::AbstractTestAction::assert_equal<std::string, std::string>;
+%template(assert_equal) maf::AbstractTestAction::assert_equal<int, int>;
+%template(assert_equal) maf::AbstractTestAction::assert_equal<long long, long long>;
+%template(assert_equal) maf::AbstractTestAction::assert_equal<double, double>;
+%template(assert_equal) maf::AbstractTestAction::assert_equal<float, float>;
+
+%template(assert_not_equal) maf::AbstractTestAction::assert_not_equal<std::string, std::string>;
+%template(assert_not_equal) maf::AbstractTestAction::assert_not_equal<int, int>;
+%template(assert_not_equal) maf::AbstractTestAction::assert_not_equal<long long, long long>;
+%template(assert_not_equal) maf::AbstractTestAction::assert_not_equal<double, double>;
+%template(assert_not_equal) maf::AbstractTestAction::assert_not_equal<float, float>;
+
+%template(assert_close) maf::AbstractTestAction::assert_close<int>;
+%template(assert_close) maf::AbstractTestAction::assert_close<long long>;
+%template(assert_close) maf::AbstractTestAction::assert_close<double>;
+%template(assert_close) maf::AbstractTestAction::assert_close<float>;
+
+%template(assert_not_close) maf::AbstractTestAction::assert_not_close<int>;
+%template(assert_not_close) maf::AbstractTestAction::assert_not_close<long long>;
+%template(assert_not_close) maf::AbstractTestAction::assert_not_close<double>;
+%template(assert_not_close) maf::AbstractTestAction::assert_not_close<float>;
+
 
 %pythoncode %{
 
+
 _FACTORY_REFRENCES = []
+
+class ActionFactory(_maf.ActionFactory):
+
+    def __init__(self, klass):
+        _maf.ActionFactory.__init__(self, klass.__name__)
+        self.klass = klass
+        _FACTORY_REFRENCES.append(self)
+        _maf.ActionFactory.Register(self)
+
+    def create_action(self):
+        return self.klass()
+
 
 _ACTION_STACK = set()
 
-class Action(_maf.Action):
+class _Action(object):
 
     def __init__(self):
-        _maf.Action.__init__(self)
         _ACTION_STACK.add(self)
-    
+
     def __del__(self):
         # when everything is getting cleaned up, it is possible that the _ACTION_STACK is None
         if _ACTION_STACK is not None:
@@ -95,15 +136,45 @@ class Action(_maf.Action):
     def type_name(self):
         return self.__class__.__name__
 
-def action(klass):
-    class PyActionFactory(ActionFactory):
-        
-        def create_action(self):
-            return klass()
-    
-    factory = PyActionFactory(klass.__name__)
-    ActionFactory.Register(factory)
-    _FACTORY_REFRENCES.append(factory)
+
+class Action(_Action, _maf.Action):
+
+    def __init__(self):
+        _Action.__init__(self)
+        _maf.Action.__init__(self)
+
+
+class TestAction(_Action, _maf.AbstractTestAction):
+
+    def __init__(self):
+        _Action.__init__(self)
+        _maf.AbstractTestAction.__init__(self)
+
+
+def action(klass_or_method):
+    if isinstance(klass_or_method, type):
+        klass = klass_or_method
+    else:
+        def run(self):
+            klass_or_method()
+        cls_dict = dict(run=run, __doc__=klass_or_method.__doc__)
+        klass = type(klass_or_method.__name__, (Action, ), cls_dict) 
+
+    factory = ActionFactory(klass)
     return klass
+
+
+def test(klass_or_method):
+    if isinstance(klass_or_method, type):
+        klass = klass_or_method
+    else:
+        def run(self):
+            klass_or_method()
+        cls_dict = dict(run=klass_or_method, __doc__=klass_or_method.__doc__)
+        klass = type(klass_or_method.__name__, (TestAction, ), cls_dict) 
+
+    factory = ActionFactory(klass)
+    return klass
+
 
 %}

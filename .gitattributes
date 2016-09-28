@@ -13,6 +13,9 @@
 *.pyw      text
 *.pyx      text
 *.c        text
+*.h        text
+*.cpp      text
+*.hpp      text
 *.rst      text
 *.xml      text
 *.json     text

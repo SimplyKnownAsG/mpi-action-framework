@@ -1,7 +1,5 @@
 #include "maf/MafComm.hpp"
 
-#include <iostream>
-
 namespace maf {
 
     std::shared_ptr<MafComm> MafComm::_Init() {
@@ -38,13 +36,32 @@ namespace maf {
         MafComm::WorldComm = this->communicator;
     }
 
+    void MafComm::abort(int exit_code) {
+        MPI_Abort(MafComm::_World->communicator, exit_code);
+    }
+
     void MafComm::barrier() {
         MPI_Barrier(this->communicator);
     }
 
-    std::string MafComm::bcast(const std::string& msg, int root) {
+    // template<>
+    // float MafComm::bcast(const float& msg, int root) {
+    //     if (this->rank == root) {
+    //         MPI_Bcast((void*)&msg, 1, MPI_FLOAT, root, this->communicator);
+    //         return msg;
+    //     }
+    //     else {
+    //         float buffer;
+    //         MPI_Bcast((void*)&buffer, 1, MPI_FLOAT, root, this->communicator);
+    //         return buffer;
+    //     }
+    // }
+
+    template<>
+    std::string MafComm::bcast<std::string>(const std::string& msg, int root) {
         int size = msg.size();
         MPI_Bcast((void*)&size, sizeof(size), MPI_INT, root, this->communicator);
+
         if (this->rank == root) {
             MPI_Bcast((void*)msg.data(), size, MPI_CHAR, root, this->communicator);
             return msg;
@@ -55,4 +72,5 @@ namespace maf {
             return buffer;
         }
     }
+
 }

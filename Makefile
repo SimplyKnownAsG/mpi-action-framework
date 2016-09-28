@@ -14,16 +14,16 @@ else
 	CXXFLAGS= -fPIC -Wall -std=c++1y -c $< -o $@ -I/usr/include/python2.7
 	LDFLAGS= -fPIC
 	LDSHARED=mpic++ -Wall -shared -o $@
-	LDSTATIC=ar crs $@
+	LDSTATIC=mpic++ -shared -o $@
 	LDEXE=mpic++ -Wall -o $@
-	LIBMAF=$(BUILD_DIR)/lib/libmaf.a
+	LIBMAF=$(BUILD_DIR)/lib/libmaf.so
 	PY_EXT=$(BIN_DIR)/_maf.so
 endif
 
 ifeq ($(MAKECMDGOALS),debug)
 	BUILD_DIR=debug
-	CXXFLAGS+= /Zi
-	LDFLAGS+= /debug /LDd
+	CXXFLAGS+= -g
+	LDFLAGS+= -g
 else
 	CXXFLAGS+= -O2
 	BUILD_DIR=release
@@ -65,6 +65,7 @@ debug: test
 
 clean:
 	-$(RM) -r ./debug/ ./release/
+	-$(RM) ./maf/maf.hpp
 	-$(RM) ./maf/*wrap*
 
 clobber: clean
