@@ -5,6 +5,7 @@
 namespace maf {
 
 #define CREATE_OPERATOR_AMP(body, string_body) \
+    virtual void operator&(bool &val) body; \
     virtual void operator&(int &val) body; \
     virtual void operator&(long long &val) body; \
     virtual void operator&(float &val) body; \
@@ -39,6 +40,10 @@ namespace maf {
         CREATE_OPERATOR_AMP( = 0, = 0);
 
         // CREATE_OPERATOR_AMP_VECTOR(= 0);
+
+        bool rw_bool(bool val) {
+            RW_BODY()
+        };
 
         int rw_int(int val) {
             RW_BODY()

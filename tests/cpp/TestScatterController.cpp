@@ -21,6 +21,7 @@ public:
 
 };
 
+
 int main(int argc, char* argv[]) {
     int exit_code = -1;
 
@@ -48,10 +49,11 @@ int main(int argc, char* argv[]) {
         actions.push_back(maf::ActionFactory::Create("IncrementContextAction"));
         maf::barrier("=== scattering ", actions.size(), " actions");
         maf::ScatterController uneven_controller(actions);
-        uneven_controller.start(std::shared_ptr<maf::Context>(new CounterContext));
-        actions.pop_back();
-        maf::barrier("=== scattering ", actions.size(), " actions");
-        uneven_controller.scatter(actions);
+        try {
+            uneven_controller.start(std::shared_ptr<maf::Context>(new CounterContext));
+        }
+        catch (maf::Exception *ex) {
+        }
         exit_code = 0;
     }
     catch (std::exception* ex) {
@@ -59,6 +61,7 @@ int main(int argc, char* argv[]) {
     }
     catch (...) {
         maf::log("FAILED: no idea what happened");
+        MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
     MPI_Finalize();

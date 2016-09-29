@@ -24,7 +24,7 @@ namespace maf {
 
         void _wait() override;
 
-        void _stop() override;
+        void _stop(bool throw_exception=true) override;
 
     };
 

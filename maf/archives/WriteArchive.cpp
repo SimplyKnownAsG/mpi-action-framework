@@ -1,6 +1,5 @@
 
 #include "maf/archives/WriteArchive.hpp"
-#include <mpi.h>
 
 namespace maf {
 

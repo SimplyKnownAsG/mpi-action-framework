@@ -44,6 +44,16 @@ namespace maf {
          */
         void take_over_the_world();
 
+        /** Restore the MafComm::World and MafComm::WorldComm equal to actual original world.
+         *
+         * Brain: We must prepare for tomorrow night.
+         * Pinky: Why? What are we going to do tomorrow night?
+         * Brain: The same thing we do every night, Pinky - try to take over the world!
+         *
+         * They're Pinky, They're Pinky and the Brain Brain Brain Brain Brain!
+         */
+        void prepare_for_tomorrow_night();
+
         void abort(int exit_code = -1);
 
         void barrier();

@@ -15,6 +15,8 @@ namespace maf {
 
         void _populate_queue(std::vector<std::shared_ptr<Action>>& queue);
 
+        void _deplete_queue();
+
     public:
 
         int rank;
@@ -41,7 +43,7 @@ namespace maf {
 
         virtual void _wait() = 0;
 
-        virtual void _stop() = 0;
+        virtual void _stop(bool throw_exception=true) = 0;
 
     };
 
