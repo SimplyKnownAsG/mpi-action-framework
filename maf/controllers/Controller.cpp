@@ -3,6 +3,8 @@
 #include "maf/actions/ActionFactory.hpp"
 #include "maf/MafComm.hpp"
 
+#include "maf/Log.hpp"
+
 namespace maf {
 
     void Controller::_populate_queue(std::vector<std::shared_ptr<Action>>& queue) {
@@ -10,6 +12,12 @@ namespace maf {
             for (auto action : queue) {
                 this->_queue.push(action);
             }
+        }
+    }
+
+    void Controller::_deplete_queue() {
+        while (!this->_queue.empty()) {
+            this->_queue.pop();
         }
     }
 
@@ -31,7 +39,13 @@ namespace maf {
 
         try {
             if (this->rank == 0) {
-                this->run();
+                try {
+                    this->run();
+                }
+                catch (...) {
+                    this->_stop(false);
+                    throw;
+                }
                 this->_stop();
             }
             else {

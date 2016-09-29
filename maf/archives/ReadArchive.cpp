@@ -1,7 +1,6 @@
 
 #include "maf/archives/ReadArchive.hpp"
 #include <string>
-#include <mpi.h>
 
 namespace maf {
 

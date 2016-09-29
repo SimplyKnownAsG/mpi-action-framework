@@ -1,4 +1,5 @@
 #include "maf/MafComm.hpp"
+#include "maf/Log.hpp"
 
 namespace maf {
 
@@ -28,12 +29,18 @@ namespace maf {
     }
 
     std::shared_ptr<MafComm> MafComm::split(int color) {
+        maf::log("MafComm::split(", color, ")");
         return this->shared_from_this();
     }
 
     void MafComm::take_over_the_world() {
+        maf::log("MafComm::take_over_the_world()");
         MafComm::World = this->shared_from_this();
         MafComm::WorldComm = this->communicator;
+    }
+
+    void MafComm::prepare_for_tomorrow_night() {
+        MafComm::World->take_over_the_world();
     }
 
     void MafComm::abort(int exit_code) {
@@ -43,19 +50,6 @@ namespace maf {
     void MafComm::barrier() {
         MPI_Barrier(this->communicator);
     }
-
-    // template<>
-    // float MafComm::bcast(const float& msg, int root) {
-    //     if (this->rank == root) {
-    //         MPI_Bcast((void*)&msg, 1, MPI_FLOAT, root, this->communicator);
-    //         return msg;
-    //     }
-    //     else {
-    //         float buffer;
-    //         MPI_Bcast((void*)&buffer, 1, MPI_FLOAT, root, this->communicator);
-    //         return buffer;
-    //     }
-    // }
 
     template<>
     std::string MafComm::bcast<std::string>(const std::string& msg, int root) {

@@ -66,10 +66,12 @@ namespace maf {
         this->bcast();
     }
 
-    void BcastController::_stop() {
-        auto act = ActionFactory::Create("EndLoopAction");
-        this->bcast(act);
-        act->start(this->context); // throws an EndLoopAction exception to successfully terminate .start()
+    void BcastController::_stop(bool throw_exception) {
+        auto end_act = ActionFactory::Create("EndLoopAction");
+        this->bcast(end_act);
+        if (throw_exception) {
+            end_act->start(this->context); // throws an EndLoopAction exception to successfully terminate .start()
+        }
     }
 
 }

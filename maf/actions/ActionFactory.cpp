@@ -1,6 +1,8 @@
 #include "maf/actions/ActionFactory.hpp"
 #include "maf/actions/EndLoopAction.hpp"
 #include "maf/actions/EmptyAction.hpp"
+#include "maf/actions/RevertSplitAction.hpp"
+#include "maf/actions/SplitMpiAction.hpp"
 #include "maf/controllers/ScatterController.hpp"
 #include "maf/controllers/BcastController.hpp"
 
@@ -12,19 +14,6 @@ namespace maf {
 
     std::unordered_map<std::string, std::shared_ptr<ActionFactory>>& ActionFactory::_Factories() {
         static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> factories;
-
-        if (!_initialized_Factories) {
-            auto end_loop = std::shared_ptr<ActionFactory>(new TActionFactory<EndLoopAction>("EndLoopAction"));
-            auto scatter = std::shared_ptr<ActionFactory>(new TActionFactory<ScatterController>("ScatterController"));
-            auto bcast = std::shared_ptr<ActionFactory>(new TActionFactory<BcastController>("BcastController"));
-            auto empty = std::shared_ptr<ActionFactory>(new TActionFactory<EmptyAction>("EmptyAction"));
-            factories[end_loop->action_name] = end_loop;
-            factories[scatter->action_name] = scatter;
-            factories[bcast->action_name] = bcast;
-            factories[empty->action_name] = empty;
-            _initialized_Factories = true;
-        }
-
         return factories;
     }
 
@@ -71,6 +60,22 @@ namespace maf {
 
     void ActionFactory::Register(std::shared_ptr<ActionFactory> factory) {
         auto name = factory->action_name;
+
+        if (!_initialized_Factories) {
+            auto end_loop = std::shared_ptr<ActionFactory>(new TActionFactory<EndLoopAction>("EndLoopAction"));
+            auto scatter = std::shared_ptr<ActionFactory>(new TActionFactory<ScatterController>("ScatterController"));
+            auto bcast = std::shared_ptr<ActionFactory>(new TActionFactory<BcastController>("BcastController"));
+            auto empty = std::shared_ptr<ActionFactory>(new TActionFactory<EmptyAction>("EmptyAction"));
+            auto split = std::shared_ptr<ActionFactory>(new TActionFactory<SplitMpiAction>("SplitMpiAction"));
+            auto revert = std::shared_ptr<ActionFactory>(new TActionFactory<RevertSplitAction>("RevertSplitAction"));
+            ActionFactory::_Factories()[end_loop->action_name] = end_loop;
+            ActionFactory::_Factories()[scatter->action_name] = scatter;
+            ActionFactory::_Factories()[bcast->action_name] = bcast;
+            ActionFactory::_Factories()[empty->action_name] = empty;
+            ActionFactory::_Factories()[split->action_name] = split;
+            ActionFactory::_Factories()[revert->action_name] = revert;
+            _initialized_Factories = true;
+        }
 
         try {
             auto func = ActionFactory::_Factories().at(name);
