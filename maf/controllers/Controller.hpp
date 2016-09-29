@@ -33,6 +33,14 @@ namespace maf {
 
         void start(std::shared_ptr<Context> context = NULL) override;
 
+        void start(std::shared_ptr<Action> action);
+
+        void start(std::shared_ptr<Context> context, std::shared_ptr<Action> action);
+
+        void start(std::vector<std::shared_ptr<Action>> actions);
+
+        void start(std::shared_ptr<Context> context, std::vector<std::shared_ptr<Action>> actions);
+
         virtual void bcast(std::shared_ptr<Action> action = NULL) = 0;
 
         virtual void bcast(std::vector<std::shared_ptr<Action>> actions) = 0;
@@ -43,7 +51,7 @@ namespace maf {
 
         virtual void _wait() = 0;
 
-        virtual void _stop(bool throw_exception=true) = 0;
+        virtual void _stop(bool throw_exception = true) = 0;
 
     };
 

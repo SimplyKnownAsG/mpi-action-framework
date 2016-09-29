@@ -10,11 +10,14 @@ namespace maf {
 
     static bool _initialized_Factories = false;
 
-    std::vector<std::shared_ptr<ActionFactory>> ActionFactory::_Tests;
-
     std::unordered_map<std::string, std::shared_ptr<ActionFactory>>& ActionFactory::_Factories() {
         static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> factories;
         return factories;
+    }
+
+    std::vector<std::shared_ptr<ActionFactory>>& ActionFactory::_Tests() {
+        static std::vector<std::shared_ptr<ActionFactory>> tests;
+        return tests;
     }
 
     std::vector<std::string> ActionFactory::Names() {
@@ -36,17 +39,17 @@ namespace maf {
         catch (std::out_of_range* ex) {
             std::ostringstream msg;
             msg << "No action with the name `" << name << "` has been registered:" << ex->what();
-            throw new Exception(msg.str());
+            throw Exception(msg.str());
         }
         catch (std::out_of_range& ex) {
             std::ostringstream msg;
             msg << "No action with the name `" << name << "` has been registered: " << ex.what();
-            throw new Exception(msg.str());
+            throw Exception(msg.str());
         }
         catch (...) {
             std::ostringstream msg;
             msg << "NO IDEA: No action with the name `" << name << "` has been registered.";
-            throw new Exception(msg.str());
+            throw Exception(msg.str());
         }
     }
 
@@ -81,7 +84,7 @@ namespace maf {
             auto func = ActionFactory::_Factories().at(name);
             std::ostringstream msg;
             msg << "Action with the name `" << name << "` has already been registered.";
-            throw new Exception(msg.str());
+            throw Exception(msg.str());
         }
         catch (std::out_of_range& ex) {
             // success

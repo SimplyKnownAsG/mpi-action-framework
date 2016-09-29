@@ -2,9 +2,9 @@
 
 #include "maf/controllers/BcastController.hpp"
 #include "maf/controllers/ScatterController.hpp"
+#include "maf/actions/ActionFactory.hpp"
 #include "maf/archives/ReadArchive.hpp"
 #include "maf/archives/WriteArchive.hpp"
-#include "maf/actions/ActionFactory.hpp"
 
 namespace maf {
 
@@ -69,6 +69,7 @@ namespace maf {
     void BcastController::_stop(bool throw_exception) {
         auto end_act = ActionFactory::Create("EndLoopAction");
         this->bcast(end_act);
+
         if (throw_exception) {
             end_act->start(this->context); // throws an EndLoopAction exception to successfully terminate .start()
         }

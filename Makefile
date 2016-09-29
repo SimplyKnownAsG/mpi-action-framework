@@ -16,7 +16,7 @@ else
 	LDSHARED=mpic++ -Wall -shared -o $@
 	LDSTATIC=ar crs $@
 	LDEXE=mpic++ -Wall -o $@
-	LIBMAF=$(BUILD_DIR)/lib/libmaf.so
+	LIBMAF=$(BUILD_DIR)/lib/libmaf.a
 	PY_EXT=$(BIN_DIR)/_maf.so
 endif
 
@@ -93,7 +93,7 @@ test_py: $(PY_EXT)
 	$(foreach pytestfile, $(PY_TEST_FILES), $(call colorecho,PYTHONPATH=$(BIN_DIR) mpiexec -n 2 python $(pytestfile)))
 
 $(LIBMAF): $(OBJ)
-	@-if [ ! -d "$(@D)" ]; then python -c 'import os; os.makedirs("$(@D)")' ; fi
+	$(mkdirs)
 	$(call colorecho,$(LDSTATIC) $^)
 
 $(PY_EXT): $(LIBMAF) $(OBJ_DIR)/maf/maf_wrap.obj

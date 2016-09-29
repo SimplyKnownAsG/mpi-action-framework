@@ -78,13 +78,7 @@ int main(int argc, char* argv[]) {
     int exit_code = -1;
 
     try {
-        std::vector<std::shared_ptr<maf::Action>> actions {
-            std::shared_ptr<maf::Action>(new test_bcast_string),
-            std::shared_ptr<maf::Action>(new test_int),
-            std::shared_ptr<maf::Action>(new test_float),
-            std::shared_ptr<maf::Action>(new test_double),
-        };
-        auto controller = maf::BcastController(actions);
+        auto controller = maf::TestController();
         controller.start();
         exit_code = 0;
     }

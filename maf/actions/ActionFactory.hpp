@@ -2,6 +2,8 @@
 
 #include "maf/actions/Action.hpp"
 #include "maf/archives/Archive.hpp"
+#include "maf/controllers/TestController.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -14,9 +16,11 @@ namespace maf {
 
     class ActionFactory {
     private:
+        friend class maf::TestController;
+
         static std::unordered_map<std::string, std::shared_ptr<ActionFactory>>& _Factories();
 
-        static std::vector<std::shared_ptr<ActionFactory>> _Tests;
+        static std::vector<std::shared_ptr<ActionFactory>>& _Tests();
 
     public:
 
@@ -35,7 +39,7 @@ namespace maf {
             ActionFactory::Register(factory);
 
             if (is_test) {
-                ActionFactory::_Tests.push_back(factory);
+                ActionFactory::_Tests().push_back(factory);
             }
 
             return true;

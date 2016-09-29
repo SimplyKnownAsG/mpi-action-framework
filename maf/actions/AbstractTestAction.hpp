@@ -13,17 +13,12 @@ namespace maf {
         bool _passed;
 
     public:
-        AbstractTestAction() : Action(), _passed(true) {
-        };
 
-        virtual ~AbstractTestAction() {
+        AbstractTestAction();
 
-        };
+        virtual ~AbstractTestAction();
 
-        void tear_down() {
-            std::string msg = this->_passed ? "passed" : "failed";
-            maf::barrier(this->type_name(), "...", msg);
-        };
+        void tear_down();
 
         template<class T1, class T2>
         void assert_equal(T1 expected, T2 actual, std::string prefix = "AssertionError: ") {
@@ -33,7 +28,7 @@ namespace maf {
                 std::ostringstream msg;
                 msg << prefix << "expected (" << expected << ") != actual (" << actual << ")";
                 maf::warning(msg.str());
-                throw new maf::Exception(msg.str());
+                throw maf::Exception(msg.str());
             }
         };
 
@@ -45,7 +40,7 @@ namespace maf {
                 std::ostringstream msg;
                 msg << prefix << "expected (" << expected << ") == actual (" << actual << ")";
                 maf::warning(msg.str());
-                throw new maf::Exception(msg.str());
+                throw maf::Exception(msg.str());
             }
         };
 
@@ -60,7 +55,7 @@ namespace maf {
                     << "( (" << actual << ") - (" << expected << ") ) / (" << expected << ") = ("
                     << error << ") > " << relative;
                 maf::warning(msg.str());
-                throw new maf::Exception(msg.str());
+                throw maf::Exception(msg.str());
             }
         };
 
@@ -75,7 +70,7 @@ namespace maf {
                     << "( (" << actual << ") - (" << expected << ") ) / (" << expected << ") = ("
                     << error << ") <= " << relative;
                 maf::warning(msg.str());
-                throw new maf::Exception(msg.str());
+                throw maf::Exception(msg.str());
             }
         };
     };
