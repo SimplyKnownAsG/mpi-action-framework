@@ -14,7 +14,7 @@ else
 	CXXFLAGS= -fPIC -Wall -std=c++1y -c $< -o $@ -I/usr/include/python2.7
 	LDFLAGS= -fPIC
 	LDSHARED=mpic++ -Wall -shared -o $@
-	LDSTATIC=mpic++ -shared -o $@
+	LDSTATIC=ar crs $@
 	LDEXE=mpic++ -Wall -o $@
 	LIBMAF=$(BUILD_DIR)/lib/libmaf.so
 	PY_EXT=$(BIN_DIR)/_maf.so

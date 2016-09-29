@@ -14,14 +14,9 @@ namespace maf {
 
     class ActionFactory {
     private:
+        static std::unordered_map<std::string, std::shared_ptr<ActionFactory>>& _Factories();
 
-        static bool _initialized;
-
-        static void _initialize();
-
-        static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> factories;
-
-        static std::vector<std::shared_ptr<ActionFactory>> tests;
+        static std::vector<std::shared_ptr<ActionFactory>> _Tests;
 
     public:
 
@@ -39,7 +34,7 @@ namespace maf {
             auto factory = std::shared_ptr<ActionFactory>(new TActionFactory<TAction>(action_name));
             ActionFactory::Register(factory);
             if (is_test) {
-                ActionFactory::tests.push_back(factory);
+                ActionFactory::_Tests.push_back(factory);
             }
             return true;
         };
