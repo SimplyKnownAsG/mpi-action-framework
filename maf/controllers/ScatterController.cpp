@@ -32,15 +32,17 @@ namespace maf {
     void ScatterController::scatter(std::vector<std::shared_ptr<Action>> actions) {
         if (this->rank == 0) {
             int num_actions = actions.size() == 0
-                ? this->_queue.size()
-                : actions.size();
+                              ? this->_queue.size()
+                              : actions.size();
+
             if (num_actions == 0 || num_actions % this->size != 0) {
                 this->_deplete_queue();
                 std::ostringstream msg;
                 msg << "Cannot scatter an unequal number of actions. num actions == " << num_actions
                     << ", but ScatterController.size == " << this->size;
-                throw new maf::Exception(msg.str());
+                throw maf::Exception(msg.str());
             }
+
             this->_populate_queue(actions);
         }
 
@@ -100,6 +102,7 @@ namespace maf {
         auto end_act = ActionFactory::Create("EndLoopAction");
         std::vector<std::shared_ptr<Action>> actions(this->size, end_act);
         this->scatter(actions);
+
         if (throw_exception) {
             end_act->start(this->context); // throws an EndLoopAction exception to successfully terminate .start()
         }

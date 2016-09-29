@@ -46,6 +46,7 @@ namespace maf {
                     this->_stop(false);
                     throw;
                 }
+
                 this->_stop();
             }
             else {
@@ -59,6 +60,26 @@ namespace maf {
         }
 
         this->tear_down();
+    }
+
+    void Controller::start(std::shared_ptr<Action> action) {
+        this->_queue.push(action);
+        this->start();
+    }
+
+    void Controller::start(std::shared_ptr<Context> context, std::shared_ptr<Action> action) {
+        this->_queue.push(action);
+        this->start(context);
+    }
+
+    void Controller::start(std::vector<std::shared_ptr<Action>> actions) {
+        this->_populate_queue(actions);
+        this->start();
+    }
+
+    void Controller::start(std::shared_ptr<Context> context, std::vector<std::shared_ptr<Action>> actions) {
+        this->_populate_queue(actions);
+        this->start(context);
     }
 
 }

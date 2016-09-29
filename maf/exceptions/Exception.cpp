@@ -1,14 +1,13 @@
 #include "maf/exceptions/Exception.hpp"
 
-
 namespace maf {
 
-    void Exception::update_message(std::exception* ex) {
-        std::istringstream inner_message(ex->what());
+    void Exception::update_message(std::exception& ex) {
+        std::istringstream inner_message(ex.what());
         std::string line;
         std::ostringstream stream;
         stream << std::endl
-               << "  " << typeid(*ex).name();
+               << "  " << typeid(&ex).name();
 
         while (std::getline(inner_message, line)) {
             stream << std::endl
@@ -21,24 +20,20 @@ namespace maf {
     }
 
     Exception::Exception(std::string message) : _message(message) {
+        
     }
 
-    Exception::Exception(std::exception* exception) {
+    Exception::Exception(std::exception& exception) {
         std::ostringstream stream;
-        stream << typeid(exception).name() << std::endl
-               << exception->what();
+        stream << typeid(&exception).name() << ": " << exception.what();
         this->_message = stream.str();
     }
 
-    Exception::Exception(std::string message, Exception* inner_exception) : _message(message) {
+    Exception::Exception(std::string message, std::exception& inner_exception) : _message(message) {
         this->update_message(inner_exception);
     }
 
-    Exception::Exception(std::string message, std::exception* inner_exception) : _message(message) {
-        this->update_message(inner_exception);
-    }
-
-    const char* Exception::what() {
+    const char* Exception::what() const noexcept {
         return this->_message.c_str();
     }
 
