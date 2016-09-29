@@ -6,28 +6,32 @@
 
 namespace maf {
 
-    bool ActionFactory::_initialized = false;
+    static bool _initialized_Factories = false;
 
-    std::unordered_map<std::string, std::shared_ptr<ActionFactory>> ActionFactory::factories;
+    std::vector<std::shared_ptr<ActionFactory>> ActionFactory::_Tests;
 
-    std::vector<std::shared_ptr<ActionFactory>> ActionFactory::tests;
+    std::unordered_map<std::string, std::shared_ptr<ActionFactory>>& ActionFactory::_Factories() {
+        static std::unordered_map<std::string, std::shared_ptr<ActionFactory>> factories;
 
-    void ActionFactory::_initialize() {
-        auto end_loop = std::shared_ptr<ActionFactory>(new TActionFactory<EndLoopAction>("EndLoopAction"));
-        auto scatter = std::shared_ptr<ActionFactory>(new TActionFactory<ScatterController>("ScatterController"));
-        auto bcast = std::shared_ptr<ActionFactory>(new TActionFactory<BcastController>("BcastController"));
-        auto empty = std::shared_ptr<ActionFactory>(new TActionFactory<EmptyAction>("EmptyAction"));
-        ActionFactory::factories[end_loop->action_name] = end_loop;
-        ActionFactory::factories[scatter->action_name] = scatter;
-        ActionFactory::factories[bcast->action_name] = bcast;
-        ActionFactory::factories[empty->action_name] = empty;
-        ActionFactory::_initialized = true;
+        if (!_initialized_Factories) {
+            auto end_loop = std::shared_ptr<ActionFactory>(new TActionFactory<EndLoopAction>("EndLoopAction"));
+            auto scatter = std::shared_ptr<ActionFactory>(new TActionFactory<ScatterController>("ScatterController"));
+            auto bcast = std::shared_ptr<ActionFactory>(new TActionFactory<BcastController>("BcastController"));
+            auto empty = std::shared_ptr<ActionFactory>(new TActionFactory<EmptyAction>("EmptyAction"));
+            factories[end_loop->action_name] = end_loop;
+            factories[scatter->action_name] = scatter;
+            factories[bcast->action_name] = bcast;
+            factories[empty->action_name] = empty;
+            _initialized_Factories = true;
+        }
+
+        return factories;
     }
 
     std::vector<std::string> ActionFactory::Names() {
         std::vector<std::string> names;
 
-        for (auto key_val : ActionFactory::factories) {
+        for (auto key_val : ActionFactory::_Factories()) {
             names.push_back(key_val.first);
         }
 
@@ -36,7 +40,7 @@ namespace maf {
 
     std::shared_ptr<Action> ActionFactory::Create(std::string name) {
         try {
-            auto factory = ActionFactory::factories.at(name);
+            auto factory = ActionFactory::_Factories().at(name);
             auto action = factory->create_action();
             return action;
         }
@@ -68,19 +72,15 @@ namespace maf {
     void ActionFactory::Register(std::shared_ptr<ActionFactory> factory) {
         auto name = factory->action_name;
 
-        if (!ActionFactory::_initialized) {
-            ActionFactory::_initialize();
-        }
-
         try {
-            auto func = ActionFactory::factories.at(name);
+            auto func = ActionFactory::_Factories().at(name);
             std::ostringstream msg;
             msg << "Action with the name `" << name << "` has already been registered.";
             throw new Exception(msg.str());
         }
         catch (std::out_of_range& ex) {
             // success
-            ActionFactory::factories[name] = factory;
+            ActionFactory::_Factories()[name] = factory;
         }
     }
 
