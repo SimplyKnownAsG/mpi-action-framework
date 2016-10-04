@@ -1,7 +1,7 @@
 #pragma once
 
 #include "maf/actions/Action.hpp"
-#include "maf/archives/Archive.hpp"
+#include "maf/communication/Archive.hpp"
 #include "maf/controllers/TestController.hpp"
 
 #include <memory>
@@ -23,6 +23,11 @@ namespace maf {
         static std::vector<std::shared_ptr<ActionFactory>>& _Tests();
 
     public:
+
+        template <class TAction>
+        static std::shared_ptr<Action> Create() {
+            return ActionFactory::Create(typeid(TAction).name());
+        };
 
         static std::shared_ptr<Action> Create(std::string name);
 
@@ -66,10 +71,5 @@ namespace maf {
             return std::shared_ptr<Action>((Action*)new TAction);
         };
     };
-
-#define MAF_ACTION(action_type) \
-    class action_type; \
-    bool action_type## _is_registerd = maf::ActionFactory::Register<action_type>(); \
-    class action_type : public maf::Action
 
 }

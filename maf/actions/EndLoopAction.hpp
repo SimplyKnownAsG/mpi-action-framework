@@ -1,11 +1,12 @@
 #pragma once
 
-#include "maf/exceptions/Exception.hpp"
 #include "maf/actions/Action.hpp"
+#include "maf/communication/Transmittable.hpp"
+#include "maf/exceptions/Exception.hpp"
 
 namespace maf {
 
-    class EndLoopAction : public Action, public Exception {
+    class EndLoopAction : public Action, public Exception, public Transmittable<EndLoopAction> {
 
     public:
         EndLoopAction();
@@ -13,8 +14,6 @@ namespace maf {
         ~EndLoopAction();
 
         void run() override;
-
-        std::string type_name() override;
     };
 
 }

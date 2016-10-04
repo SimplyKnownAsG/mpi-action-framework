@@ -1,13 +1,15 @@
 #include "mpi.h"
 
+#include "maf/controllers/BcastController.hpp"
 #include "maf/controllers/ScatterController.hpp"
-#include "maf/archives/ReadArchive.hpp"
-#include "maf/archives/WriteArchive.hpp"
+#include "maf/communication/ReadArchive.hpp"
+#include "maf/communication/WriteArchive.hpp"
 #include "maf/actions/ActionFactory.hpp"
 #include "maf/actions/SplitMpiAction.hpp"
 #include "maf/actions/RevertSplitAction.hpp"
 #include "maf/actions/EmptyAction.hpp"
 #include "maf/exceptions/Exception.hpp"
+#include "maf/actions/EndLoopAction.hpp"
 
 #include "maf/Log.hpp"
 
@@ -26,6 +28,9 @@ namespace maf {
     }
 
     void ScatterController::bcast(std::vector<std::shared_ptr<Action>> actions) {
+        BcastController controller(actions);
+        controller.start(this->context);
+        
         return;
     }
 
@@ -89,17 +94,13 @@ namespace maf {
         this->scatter(actions);
     }
 
-    std::string ScatterController::type_name() {
-        return "ScatterController";
-    }
-
     void ScatterController::_wait() {
         std::vector<std::shared_ptr<Action>> empty_actions;
         this->scatter(empty_actions);
     }
 
     void ScatterController::_stop(bool throw_exception) {
-        auto end_act = ActionFactory::Create("EndLoopAction");
+        auto end_act = ActionFactory::Create<EndLoopAction>();
         std::vector<std::shared_ptr<Action>> actions(this->size, end_act);
         this->scatter(actions);
 

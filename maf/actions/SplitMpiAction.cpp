@@ -1,5 +1,5 @@
 #include "maf/actions/SplitMpiAction.hpp"
-#include "maf/MafComm.hpp"
+#include "maf/communication/MafComm.hpp"
 
 namespace maf {
 

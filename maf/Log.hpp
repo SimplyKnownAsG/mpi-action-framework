@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include "maf/MafComm.hpp"
+#include "maf/communication/MafComm.hpp"
 
 
 namespace maf {

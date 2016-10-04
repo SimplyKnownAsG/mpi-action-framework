@@ -1,7 +1,7 @@
 
 #include "maf/controllers/Controller.hpp"
 #include "maf/actions/ActionFactory.hpp"
-#include "maf/MafComm.hpp"
+#include "maf/communication/MafComm.hpp"
 
 #include "maf/Log.hpp"
 

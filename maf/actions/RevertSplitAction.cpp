@@ -1,5 +1,5 @@
 #include "maf/actions/RevertSplitAction.hpp"
-#include "maf/MafComm.hpp"
+#include "maf/communication/MafComm.hpp"
 
 namespace maf {
     RevertSplitAction::RevertSplitAction() : Action() {

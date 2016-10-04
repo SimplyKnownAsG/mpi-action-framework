@@ -1,10 +1,11 @@
 #pragma once
 
+#include "maf/communication/Transmittable.hpp"
 #include "maf/controllers/Controller.hpp"
 
 namespace maf {
 
-    class BcastController : public Controller {
+    class BcastController : public Controller, public Transmittable<BcastController> {
 
     public:
 
@@ -19,8 +20,6 @@ namespace maf {
         void scatter(std::vector<std::shared_ptr<Action>> actions) override;
 
         virtual void run() override;
-
-        std::string type_name() override;
 
     private:
 

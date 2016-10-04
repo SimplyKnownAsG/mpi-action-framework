@@ -1,5 +1,5 @@
 
-#include "maf/archives/WriteArchive.hpp"
+#include "maf/communication/WriteArchive.hpp"
 
 namespace maf {
 
