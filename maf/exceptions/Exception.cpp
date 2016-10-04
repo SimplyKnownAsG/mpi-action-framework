@@ -33,7 +33,7 @@ namespace maf {
         this->update_message(inner_exception);
     }
 
-    const char* Exception::what() const noexcept {
+    const char* Exception::what() const NOEXCEPT {
         return this->_message.c_str();
     }
 

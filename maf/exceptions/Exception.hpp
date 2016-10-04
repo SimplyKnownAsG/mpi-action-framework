@@ -5,6 +5,12 @@
 #include <sstream>
 #include <typeinfo>
 
+#ifdef _WIN32
+#define NOEXCEPT
+#else
+#define NOEXCEPT noexcept
+#endif
+
 namespace maf {
 
     /// A general exception class
@@ -28,7 +34,7 @@ namespace maf {
         Exception(std::string message, std::exception& inner_exception);
 
         /// Returns a string representation of the issue.
-        const char* what() const noexcept override;
+        const char* what() const NOEXCEPT override;
 
     };
 
