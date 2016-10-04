@@ -3,8 +3,9 @@
 #include "maf/controllers/BcastController.hpp"
 #include "maf/controllers/ScatterController.hpp"
 #include "maf/actions/ActionFactory.hpp"
-#include "maf/archives/ReadArchive.hpp"
-#include "maf/archives/WriteArchive.hpp"
+#include "maf/communication/ReadArchive.hpp"
+#include "maf/communication/WriteArchive.hpp"
+#include "maf/actions/EndLoopAction.hpp"
 
 namespace maf {
 
@@ -58,16 +59,12 @@ namespace maf {
         }
     }
 
-    std::string BcastController::type_name() {
-        return "BcastController";
-    }
-
     void BcastController::_wait() {
         this->bcast();
     }
 
     void BcastController::_stop(bool throw_exception) {
-        auto end_act = ActionFactory::Create("EndLoopAction");
+        auto end_act = ActionFactory::Create<EndLoopAction>();
         this->bcast(end_act);
 
         if (throw_exception) {

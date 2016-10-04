@@ -1,6 +1,6 @@
 #pragma once
 
-#include "maf/archives/Archive.hpp"
+#include "maf/communication/Archive.hpp"
 #include <sstream>
 
 namespace maf {

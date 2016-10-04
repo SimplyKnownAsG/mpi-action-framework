@@ -14,8 +14,4 @@ namespace maf {
         // empty, as promised
     }
 
-    std::string EmptyAction::type_name() {
-        return "EmptyAction";
-    }
-
 }

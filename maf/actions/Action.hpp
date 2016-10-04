@@ -1,6 +1,6 @@
 #pragma once
 
-#include "maf/archives/Archive.hpp"
+#include "maf/communication/Transmittable.hpp"
 #include "maf/Context.hpp"
 
 #include <unordered_map>
@@ -9,7 +9,7 @@
 
 namespace maf {
 
-    class Action : public std::enable_shared_from_this<Action> {
+    class Action : public virtual _Transmittable, public std::enable_shared_from_this<Action> {
 
     public:
 
@@ -21,15 +21,11 @@ namespace maf {
 
         virtual void run() = 0;
 
-        virtual void serialize(std::shared_ptr<Archive> archive);
-
         virtual void set_up();
 
         virtual void start(std::shared_ptr<Context> context = NULL);
 
         virtual void tear_down();
-
-        virtual std::string type_name() = 0;
     };
 
 }

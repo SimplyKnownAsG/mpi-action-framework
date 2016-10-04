@@ -14,8 +14,4 @@ namespace maf {
         throw this_p;
     }
 
-    std::string EndLoopAction::type_name() {
-        return "EndLoopAction";
-    }
-
 }

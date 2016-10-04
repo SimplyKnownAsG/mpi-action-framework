@@ -1,4 +1,4 @@
-#include "maf/MafComm.hpp"
+#include "maf/communication/MafComm.hpp"
 #include "maf/Log.hpp"
 
 namespace maf {

@@ -10,10 +10,6 @@ namespace maf {
     Action::~Action() {
     }
 
-    void Action::serialize(std::shared_ptr<Archive> archive) {
-        return;
-    }
-
     void Action::set_up() {
         return;
     }

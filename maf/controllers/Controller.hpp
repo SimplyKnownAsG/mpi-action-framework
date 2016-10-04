@@ -1,13 +1,14 @@
 #pragma once
 
 #include "maf/actions/Action.hpp"
+#include "maf/communication/Transmittable.hpp"
 #include "maf/Context.hpp"
 
 #include <queue>
 
 namespace maf {
 
-    class Controller : public Action {
+    class Controller : public virtual Action {
 
     protected:
 

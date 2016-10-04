@@ -1,5 +1,5 @@
 
-#include "maf/archives/ReadArchive.hpp"
+#include "maf/communication/ReadArchive.hpp"
 #include <string>
 
 namespace maf {

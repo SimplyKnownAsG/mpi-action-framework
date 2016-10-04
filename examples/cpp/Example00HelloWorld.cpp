@@ -33,8 +33,8 @@ int main(int argc, char* argv[]) {
         maf::BcastController controller(actions);
         controller.start();
     }
-    catch (std::exception* ex) {
-        maf::log("FAILED: ", ex->what());
+    catch (std::exception& ex) {
+        maf::log("FAILED: ", ex.what());
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
     catch (...) {
