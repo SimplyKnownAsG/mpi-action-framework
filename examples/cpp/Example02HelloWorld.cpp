@@ -2,7 +2,7 @@
 
 #include <mpi.h>
 
-class HelloWorldAction : public maf::Action {
+class HelloWorldAction : public maf::Action, public maf::Transmittable<HelloWorldAction> {
 
 public:
 
@@ -38,10 +38,6 @@ public:
         (*archive) & this->my_double;
     };
 
-    std::string type_name() {
-        return "HelloWorldAction";
-    }
-
 };
 
 
@@ -71,9 +67,7 @@ int main(int argc, char* argv[]) {
     int exit_code = -1;
 
     try {
-        // std::shared_ptr<ActionFactory> factory((ActionFactory*)(new TActionFactory<HelloWorldAction>("HelloWorldAction")));
-        auto factory = std::shared_ptr<maf::ActionFactory>((maf::ActionFactory*)(new maf::TActionFactory<HelloWorldAction>("HelloWorldAction")));
-        maf::ActionFactory::Register(factory);
+        maf::ActionFactory::Register<HelloWorldAction>();
 
         maf::barrier("===== TestBcastController controller;");
 
