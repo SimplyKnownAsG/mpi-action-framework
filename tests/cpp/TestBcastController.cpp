@@ -43,6 +43,7 @@ MAF_TEST_ACTION(test_bcast_action_vector) {
         auto context = std::shared_ptr<maf::Context>(new CounterContext);
         this->assert_equal(0, context->as<CounterContext>()->count);
         controller.context = context;
+
         if (controller.rank == 0) {
             controller.bcast(actions);
             this->assert_equal(0, context->as<CounterContext>()->count);
@@ -56,6 +57,7 @@ MAF_TEST_ACTION(test_bcast_action_vector) {
         else {
             controller.start(context);
         }
+
         this->assert_equal(7, context->as<CounterContext>()->count);
     }
 };
@@ -66,6 +68,7 @@ int main(int argc, char* argv[]) {
 
     auto factory = std::shared_ptr<maf::ActionFactory>((maf::ActionFactory*)(new maf::TActionFactory<IncrementContextAction>("IncrementContextAction")));
     maf::ActionFactory::Register(factory);
+
     try {
         auto controller = maf::TestController();
         controller.start();
@@ -77,6 +80,7 @@ int main(int argc, char* argv[]) {
     catch (...) {
         maf::log("FAILED: no idea what happened");
     }
+
     if (exit_code == -1) {
         MPI_Abort(MPI_COMM_WORLD, -1);
     }

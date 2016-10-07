@@ -30,7 +30,7 @@ namespace maf {
     void ScatterController::bcast(std::vector<std::shared_ptr<Action>> actions) {
         BcastController controller(actions);
         controller.start(this->context);
-        
+
         return;
     }
 

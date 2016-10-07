@@ -22,7 +22,7 @@ public:
         this->my_double = double_;
     };
 
-    void run() {
+    void run() override {
         maf::log("Hello World! (from c++)",
                  "     my_string: `", this->my_string,
                  "`     my_int: `", this->my_int,
@@ -31,7 +31,7 @@ public:
                 );
     };
 
-    void serialize(std::shared_ptr<maf::Archive> archive) {
+    void serialize(std::shared_ptr<maf::Archive> archive) override {
         (*archive) & this->my_string;
         (*archive) & this->my_int;
         (*archive) & this->my_float;

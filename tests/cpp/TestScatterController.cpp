@@ -49,11 +49,13 @@ int main(int argc, char* argv[]) {
         actions.push_back(maf::ActionFactory::Create("IncrementContextAction"));
         maf::barrier("=== scattering ", actions.size(), " actions");
         maf::ScatterController uneven_controller(actions);
+
         try {
             uneven_controller.start(std::shared_ptr<maf::Context>(new CounterContext));
         }
-        catch (maf::Exception *ex) {
+        catch (maf::Exception* ex) {
         }
+
         exit_code = 0;
     }
     catch (std::exception* ex) {

@@ -55,10 +55,12 @@ namespace maf {
 
     void TestController::run() {
         maf::log("Found ", ActionFactory::_Tests().size(), " tests.");
+
         for (auto test_factory : ActionFactory::_Tests()) {
             auto test = test_factory->create_action();
             this->bcast(test);
         }
+
         maf::log("Ran ", ActionFactory::_Tests().size(), " tests.");
     }
 
