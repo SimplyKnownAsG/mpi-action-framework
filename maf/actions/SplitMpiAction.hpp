@@ -17,7 +17,7 @@ namespace maf {
 
         void run() override;
 
-        void serialize(std::shared_ptr<Archive> archive);
+        void serialize(std::shared_ptr<Archive> archive) override;
 
         std::string type_name() override;
     };

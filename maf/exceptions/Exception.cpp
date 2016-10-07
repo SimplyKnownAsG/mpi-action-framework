@@ -20,7 +20,7 @@ namespace maf {
     }
 
     Exception::Exception(std::string message) : _message(message) {
-        
+
     }
 
     Exception::Exception(std::exception& exception) {

@@ -59,7 +59,14 @@ namespace maf {
         void barrier();
 
         template<class T>
-        T bcast(const T& msg, int root = 0) {
+        T bcast(T msg, int root = 0) {
+            return this->_bcast(msg, static_cast<T*>(0), root);
+        };
+
+    private:
+
+        template<class T>
+        T _bcast(T msg, T* _ignored, int root = 0) {
             if (this->rank == root) {
                 MPI_Bcast((void*)&msg, sizeof(T), MPI_CHAR, root, this->communicator);
                 return msg;
@@ -71,25 +78,25 @@ namespace maf {
             }
         };
 
-        // template<class T>
-        // std::vector<T> bcast(const std::vector<T>& msg, int root=0) {
-        //     int size = msg.size();
-        //     MPI_Bcast((void*)&size, sizeof(size), MPI_INT, root, this->communicator);
-
-        //     if (this->rank == root) {
-        //         MPI_Bcast((void*)msg.data(), size, MPI_CHAR, root, this->communicator);
-        //         return msg;
-        //     }
-        //     else {
-        //         std::vector<T> buffer(size);
-        //         MPI_Bcast((void*)buffer.data(), size, MPI_CHAR, root, this->communicator);
-        //         return buffer;
-        //     }
-        // };
+        template<class T>
+        std::vector<T> _bcast(std::vector<T> msg, std::vector<T>* _ignored, int root = 0) {
+            size_t size = msg.size();
+            MPI_Bcast((void*)&size, sizeof(size), MPI_INT, root, this->communicator);
+            
+            if (this->rank != root) {
+                std::vector<T> buffer(size);
+                MPI_Bcast((void*)buffer.data(), sizeof(T) * size, MPI_CHAR, root, this->communicator);
+                return buffer;
+            }
+            else {
+                MPI_Bcast((void*)msg.data(), sizeof(T) * size, MPI_CHAR, root, this->communicator);
+                return msg;
+            }
+        };
 
     };
 
     template<>
-    std::string MafComm::bcast<std::string>(const std::string& msg, int root);
+    std::string MafComm::bcast<std::string>(std::string msg, int root);
 
 }

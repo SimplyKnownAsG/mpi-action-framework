@@ -52,7 +52,7 @@ namespace maf {
     }
 
     template<>
-    std::string MafComm::bcast<std::string>(const std::string& msg, int root) {
+    std::string MafComm::bcast<std::string>(std::string msg, int root) {
         int size = msg.size();
         MPI_Bcast((void*)&size, sizeof(size), MPI_INT, root, this->communicator);
 

@@ -11,7 +11,7 @@ namespace maf {
 
     public:
         virtual std::string type_name() = 0;
-        
+
         virtual void serialize(std::shared_ptr<Archive> archive);
     };
 
