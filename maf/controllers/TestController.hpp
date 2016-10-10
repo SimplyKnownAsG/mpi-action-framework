@@ -11,6 +11,8 @@ namespace maf {
 
         TestController();
 
+        ~TestController();
+
         TestController(std::vector<std::shared_ptr<Action>> actions);
 
         void bcast(std::shared_ptr<Action> action = NULL) override;

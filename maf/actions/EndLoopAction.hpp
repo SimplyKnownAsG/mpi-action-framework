@@ -7,9 +7,11 @@
 namespace maf {
 
     class EndLoopAction : public Action, public Exception, public Transmittable<EndLoopAction> {
+    private:
+        bool _throw; 
 
     public:
-        EndLoopAction();
+        EndLoopAction(bool throw_=true);
 
         ~EndLoopAction();
 

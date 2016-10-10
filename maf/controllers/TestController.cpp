@@ -15,6 +15,10 @@ namespace maf {
         // empty;
     }
 
+    TestController::~TestController() {
+        // empty;
+    }
+
     TestController::TestController(std::vector<std::shared_ptr<Action>> actions) : Controller(actions) {
         // empty;
     }

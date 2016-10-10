@@ -1,6 +1,4 @@
 '''test functionality in Python'''
-from mpi4py.MPI import COMM_WORLD # this lets mpi4py handle MPI_Init and MPI_Finalize
-
 import maf
 
 import sys

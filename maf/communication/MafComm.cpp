@@ -1,5 +1,5 @@
 #include "maf/communication/MafComm.hpp"
-#include "maf/Log.hpp"
+
 
 namespace maf {
 
@@ -29,12 +29,10 @@ namespace maf {
     }
 
     std::shared_ptr<MafComm> MafComm::split(int color) {
-        maf::log("MafComm::split(", color, ")");
         return this->shared_from_this();
     }
 
     void MafComm::take_over_the_world() {
-        maf::log("MafComm::take_over_the_world()");
         MafComm::World = this->shared_from_this();
         MafComm::WorldComm = this->communicator;
     }

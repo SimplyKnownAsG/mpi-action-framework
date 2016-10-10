@@ -1,7 +1,7 @@
 #include "maf/actions/EndLoopAction.hpp"
 
 namespace maf {
-    EndLoopAction::EndLoopAction() : Action(), Exception("ending the loop") {
+    EndLoopAction::EndLoopAction(bool throw_) : Action(), Exception("ending the loop"), _throw(throw_) {
 
     };
 
@@ -10,8 +10,10 @@ namespace maf {
     }
 
     void EndLoopAction::run() {
-        auto this_p = shared_from_this();
-        throw this_p;
+        if (this->_throw) {
+            auto this_p = shared_from_this();
+            throw this_p;
+        }
     }
 
 }

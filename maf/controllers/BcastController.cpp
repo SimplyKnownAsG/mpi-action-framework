@@ -7,6 +7,7 @@
 #include "maf/communication/WriteArchive.hpp"
 #include "maf/actions/EndLoopAction.hpp"
 
+
 namespace maf {
 
     BcastController::BcastController() : Controller() {
@@ -37,7 +38,7 @@ namespace maf {
             std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new ReadArchive(data));
             action = ActionFactory::Create(archive);
         }
-
+        
         action->start(this->context);
     }
 
@@ -64,12 +65,8 @@ namespace maf {
     }
 
     void BcastController::_stop(bool throw_exception) {
-        auto end_act = ActionFactory::Create<EndLoopAction>();
+        auto end_act = std::shared_ptr<Action>(new EndLoopAction(throw_exception));
         this->bcast(end_act);
-
-        if (throw_exception) {
-            end_act->start(this->context); // throws an EndLoopAction exception to successfully terminate .start()
-        }
     }
 
 }

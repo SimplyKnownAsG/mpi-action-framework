@@ -109,6 +109,7 @@ $(BIN_DIR)/%.exe: maf/maf.hpp $(OBJ_DIR)/%.obj $(LIBMAF)
 	$(call colorecho,$(LDEXE) $(filter-out maf/maf.hpp,$^))
 
 $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: maf.i maf/maf.hpp
+	$(mkdirs)
 	$(call colorecho,swig -python -builtin -includeall -ignoremissing -c++ -outdir $(BIN_DIR) -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i)
 
 $(OBJ_DIR)/%.obj: %.cpp %.hpp

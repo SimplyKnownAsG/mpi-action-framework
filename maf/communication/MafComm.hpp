@@ -5,6 +5,8 @@
 #include <vector>
 #include "mpi.h"
 
+#include <iostream>
+
 namespace maf {
 
     class MafComm : public std::enable_shared_from_this<MafComm> {
@@ -67,6 +69,7 @@ namespace maf {
 
         template<class T>
         T _bcast(T msg, T* _ignored, int root = 0) {
+            std::cout << "MafComm::bcast<" << typeid(T).name() << ">(" << msg << ")" << std::endl;
             if (this->rank == root) {
                 MPI_Bcast((void*)&msg, sizeof(T), MPI_CHAR, root, this->communicator);
                 return msg;
@@ -80,6 +83,7 @@ namespace maf {
 
         template<class T>
         std::vector<T> _bcast(std::vector<T> msg, std::vector<T>* _ignored, int root = 0) {
+            std::cout << "MafComm::bcast<vector<" << typeid(T).name() << ">>()" << std::endl;
             size_t size = msg.size();
             MPI_Bcast((void*)&size, sizeof(size), MPI_INT, root, this->communicator);
             
