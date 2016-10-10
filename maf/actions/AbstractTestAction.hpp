@@ -96,7 +96,6 @@ namespace maf {
             }
         };
 
-
         template<class T>
         void _assert_not_equal(const std::vector<T>& expected, const std::vector<T>& actual, std::vector<T>* _ignored, std::string prefix) {
             this->_passed = expected.size() != actual.size();

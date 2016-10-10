@@ -11,7 +11,6 @@
 #include "maf/exceptions/Exception.hpp"
 #include "maf/actions/EndLoopAction.hpp"
 
-#include "maf/Log.hpp"
 
 namespace maf {
 

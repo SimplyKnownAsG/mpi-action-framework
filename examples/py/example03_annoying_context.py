@@ -1,5 +1,4 @@
 '''test functionality in Python'''
-from mpi4py.MPI import COMM_WORLD
 import maf
 
 

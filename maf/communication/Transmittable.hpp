@@ -10,13 +10,16 @@ namespace maf {
     class _Transmittable {
 
     public:
-        virtual std::string type_name() = 0;
+        virtual ~_Transmittable();
+
+        virtual std::string type_name();
 
         virtual void serialize(std::shared_ptr<Archive> archive);
     };
 
     template <class T>
     class Transmittable : public virtual _Transmittable {
+
     public:
 
         std::string type_name() override {

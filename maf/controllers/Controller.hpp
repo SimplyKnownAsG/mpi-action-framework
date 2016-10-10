@@ -8,7 +8,7 @@
 
 namespace maf {
 
-    class Controller : public virtual Action {
+    class Controller : public Action {
 
     protected:
 
