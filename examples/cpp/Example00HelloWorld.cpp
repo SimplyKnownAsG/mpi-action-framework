@@ -35,6 +35,4 @@ int main(int argc, char* argv[]) {
         maf::log("FAILED: no idea what happened");
         MPI_Abort(MPI_COMM_WORLD, -1);
     }
-
-    MPI_Finalize();
 }

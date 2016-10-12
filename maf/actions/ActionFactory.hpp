@@ -35,18 +35,13 @@ namespace maf {
 
         static std::vector<std::string> Names();
 
-        static void Register(std::shared_ptr<ActionFactory> factory);
+        static void Register(std::shared_ptr<ActionFactory> factory, bool is_test = false);
 
         template <class TAction>
         static bool Register(bool is_test = false) {
             std::string action_name = typeid(TAction).name();
             auto factory = std::shared_ptr<ActionFactory>(new TActionFactory<TAction>(action_name));
-            ActionFactory::Register(factory);
-
-            if (is_test) {
-                ActionFactory::_Tests().push_back(factory);
-            }
-
+            ActionFactory::Register(factory, is_test);
             return true;
         };
 

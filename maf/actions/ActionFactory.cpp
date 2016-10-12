@@ -61,7 +61,7 @@ namespace maf {
         return action;
     }
 
-    void ActionFactory::Register(std::shared_ptr<ActionFactory> factory) {
+    void ActionFactory::Register(std::shared_ptr<ActionFactory> factory, bool is_test) {
         auto name = factory->action_name;
 
         if (!_initialized_Factories) {
@@ -83,6 +83,10 @@ namespace maf {
         catch (std::out_of_range& ex) {
             // success
             ActionFactory::_Factories()[name] = factory;
+        }
+
+        if (is_test) {
+            ActionFactory::_Tests().push_back(factory);
         }
     }
 

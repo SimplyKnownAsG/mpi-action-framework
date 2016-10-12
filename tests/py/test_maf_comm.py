@@ -66,9 +66,5 @@ def test_bcast_double(self):
 
 if __name__ == '__main__':
     maf.barrier('ERROR: these tests fail due to an error in SWiG. See https://github.com/swig/swig/issues/773')
-    # actions = [test_bcast_string(), test_bcast_int(), test_bcast_float(), test_bcast_double()]
-
-    # maf.log('about to create BcastController')
-    # controller = maf.BcastController(actions)
-    # maf.log('about to .start()')
+    # controller = maf.TestController()
     # controller.start()

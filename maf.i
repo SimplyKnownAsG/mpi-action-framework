@@ -52,12 +52,15 @@ namespace std {
 %feature("director") maf::Controller;
 %feature("director") maf::BcastController;
 %feature("director") maf::ScatterController;
+%feature("director") maf::TestController;
 %feature("nodirector") maf::Controller::scatter;
 %feature("nodirector") maf::BcastController::scatter;
 %feature("nodirector") maf::ScatterController::scatter;
+%feature("nodirector") maf::TestController::scatter;
 %feature("nodirector") maf::Controller::bcast;
 %feature("nodirector") maf::BcastController::bcast;
 %feature("nodirector") maf::ScatterController::bcast;
+%feature("nodirector") maf::TestController::bcast;
 %shared_ptr(maf::Archive);
 %shared_ptr(maf::ReadArchive);
 %shared_ptr(maf::WriteArchive);
@@ -130,11 +133,11 @@ _FACTORY_REFRENCES = []
 
 class ActionFactory(_maf.ActionFactory):
 
-    def __init__(self, klass):
+    def __init__(self, klass, is_test):
         _maf.ActionFactory.__init__(self, klass.__name__)
         self.klass = klass
         _FACTORY_REFRENCES.append(self)
-        _maf.ActionFactory.Register(self)
+        _maf.ActionFactory.Register(self, is_test)
 
     def create_action(self):
         return self.klass()
@@ -182,7 +185,7 @@ def action(klass_or_method):
         cls_dict = dict(run=run, __doc__=klass_or_method.__doc__)
         klass = type(klass_or_method.__name__, (Action, ), cls_dict) 
 
-    factory = ActionFactory(klass)
+    factory = ActionFactory(klass, False)
     return klass
 
 
@@ -191,11 +194,16 @@ def test(klass_or_method):
         klass = klass_or_method
     else:
         def run(self):
-            klass_or_method()
+            klass_or_method(self)
         cls_dict = dict(run=klass_or_method, __doc__=klass_or_method.__doc__)
         klass = type(klass_or_method.__name__, (TestAction, ), cls_dict) 
 
-    factory = ActionFactory(klass)
+    factory = ActionFactory(klass, True)
     return klass
 
+import atexit
+atexit.register(MafComm.Finalize)
+del atexit
+
 %}
+

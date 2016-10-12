@@ -15,7 +15,7 @@ namespace maf {
         int rank, size;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         MPI_Comm_size(MPI_COMM_WORLD, &size);
-        return std::shared_ptr<MafComm>(new MafComm(MPI_COMM_WORLD, rank, size));
+        return std::shared_ptr<MafComm>(new MafComm(MPI_COMM_WORLD, rank, size, true));
     }
 
     std::shared_ptr<MafComm> MafComm::_World = MafComm::_Init();
@@ -24,8 +24,23 @@ namespace maf {
 
     MPI_Comm MafComm::WorldComm = MafComm::_World->communicator;
 
-    MafComm::MafComm(MPI_Comm communicator, int rank, int size) : communicator(communicator), rank(rank), size(size) {
+    MafComm::MafComm(MPI_Comm communicator, int rank, int size, bool is_root)
+        : communicator(communicator), rank(rank), size(size), is_root(is_root) {
 
+    }
+
+    MafComm::~MafComm() {
+        if (this->is_root) {
+            MafComm::Finalize();
+        }
+    }
+
+    void MafComm::Finalize() {
+        int finalized;
+        MPI_Finalized(&finalized);
+        if (!finalized) {
+            MPI_Finalize();
+        }
     }
 
     std::shared_ptr<MafComm> MafComm::split(int color) {
