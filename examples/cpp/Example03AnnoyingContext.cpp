@@ -48,13 +48,14 @@ int main(int argc, char* argv[]) {
 
         exit_code = 0;
     }
-    catch (std::exception* ex) {
-        maf::log("FAILED: ", ex->what());
+    catch (std::exception& ex) {
+        maf::log("FAILED: ", ex.what());
+        MPI_Abort(MPI_COMM_WORLD, -1);
     }
     catch (...) {
         maf::log("FAILED: no idea what happened");
+        MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
-    MPI_Finalize();
     return exit_code;
 }

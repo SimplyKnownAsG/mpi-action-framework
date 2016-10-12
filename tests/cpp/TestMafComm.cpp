@@ -76,7 +76,7 @@ MAF_TEST_ACTION(test_bcast_float_vector) {
     void run() {
         auto world = maf::MafComm::World;
         std::vector<float> val(world->size - world->rank, (world->rank + 3) * 3.3);
-        std::vector<float> expected {9.9, 9.9, 9.9};
+        std::vector<float> expected {9.9f, 9.9f, 9.9f};
 
         if (world->rank == 0) {
             this->assert_close(expected, val, 1e-5f);
@@ -141,6 +141,5 @@ int main(int argc, char* argv[]) {
         maf::log("FAILED: no idea what happened");
     }
 
-    MPI_Finalize();
     return exit_code;
 }

@@ -52,12 +52,15 @@ namespace std {
 %feature("director") maf::Controller;
 %feature("director") maf::BcastController;
 %feature("director") maf::ScatterController;
+%feature("director") maf::TestController;
 %feature("nodirector") maf::Controller::scatter;
 %feature("nodirector") maf::BcastController::scatter;
 %feature("nodirector") maf::ScatterController::scatter;
+%feature("nodirector") maf::TestController::scatter;
 %feature("nodirector") maf::Controller::bcast;
 %feature("nodirector") maf::BcastController::bcast;
 %feature("nodirector") maf::ScatterController::bcast;
+%feature("nodirector") maf::TestController::bcast;
 %shared_ptr(maf::Archive);
 %shared_ptr(maf::ReadArchive);
 %shared_ptr(maf::WriteArchive);
@@ -198,4 +201,9 @@ def test(klass_or_method):
     factory = ActionFactory(klass)
     return klass
 
+import atexit
+atexit.register(MafComm.Finalize)
+del atexit
+
 %}
+

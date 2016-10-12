@@ -7,6 +7,7 @@
 #include "maf/communication/WriteArchive.hpp"
 #include "maf/actions/EndLoopAction.hpp"
 
+#include "maf/Log.hpp"
 
 namespace maf {
 
@@ -15,6 +16,10 @@ namespace maf {
     }
 
     BcastController::BcastController(std::vector<std::shared_ptr<Action>> actions) : Controller(actions) {
+        // empty;
+    }
+
+    BcastController::~BcastController() {
         // empty;
     }
 

@@ -11,6 +11,8 @@ namespace maf {
 
         BcastController();
 
+        virtual ~BcastController();
+
         BcastController(std::vector<std::shared_ptr<Action>> actions);
 
         void bcast(std::shared_ptr<Action> action = NULL) override;

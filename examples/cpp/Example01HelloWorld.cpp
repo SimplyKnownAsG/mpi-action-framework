@@ -31,14 +31,12 @@ int main(int argc, char* argv[]) {
         TestBcastController controller;
         controller.start();
     }
-    catch (std::exception* ex) {
-        maf::log("FAILED: ", ex->what());
-        return -1;
+    catch (std::exception& ex) {
+        maf::log("FAILED: ", ex.what());
+        MPI_Abort(MPI_COMM_WORLD, -1);
     }
     catch (...) {
         maf::log("FAILED: no idea what happened");
-        return -1;
+        MPI_Abort(MPI_COMM_WORLD, -1);
     }
-
-    MPI_Finalize();
 }

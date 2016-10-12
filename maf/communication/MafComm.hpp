@@ -13,21 +13,26 @@ namespace maf {
     private:
         static std::shared_ptr<MafComm> _World;
 
-        MafComm(MPI_Comm communicator, int rank, int size);
-
         static std::shared_ptr<MafComm> _Init();
 
+        MafComm(MPI_Comm communicator, int rank, int size, bool is_root = false);
+
     public:
+        ~MafComm();
 
         static std::shared_ptr<MafComm> World;
 
         static MPI_Comm WorldComm;
+
+        static void Finalize();
 
         const MPI_Comm communicator;
 
         const int rank;
 
         const int size;
+
+        const bool is_root; 
 
         std::shared_ptr<MafComm> split(int color);
 
