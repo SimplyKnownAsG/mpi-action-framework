@@ -39,7 +39,7 @@ MAF_TEST_ACTION(test_bcast_int) {
 MAF_TEST_ACTION(test_bcast_int_vector) {
     void run() {
         auto world = maf::MafComm::World;
-        std::vector<int> val(3, (world->rank + 3) * 3);
+        std::vector<int> val(world->size - world->rank, (world->rank + 3) * 3);
         std::vector<int> expected {9, 9, 9};
 
         if (world->rank == 0) {
@@ -67,7 +67,6 @@ MAF_TEST_ACTION(test_bcast_float) {
         }
 
         val = world->bcast(val);
-
         this->assert_close(9.9f, val, 1e-5f);
     }
 };
@@ -134,11 +133,14 @@ int main(int argc, char* argv[]) {
         controller.start();
         exit_code = 0;
     }
-    catch (std::exception* ex) {
-        maf::log("FAILED: *", ex->what());
+    catch (std::exception& ex) {
+        maf::log("FAILED: &", ex.what());
     }
     catch (...) {
         maf::log("FAILED: no idea what happened");
+    }
+    if (exit_code != 0) {
+        MPI_Abort(MPI_COMM_WORLD, -1);
     }
 
     return exit_code;

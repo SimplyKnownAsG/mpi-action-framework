@@ -33,6 +33,7 @@ namespace maf {
 
             if (!this->_passed) {
                 std::ostringstream msg;
+                msg << this->type_name() << " ... "; 
                 msg << prefix << "expected (" << expected << ") != actual (" << actual << ")";
                 maf::warning(msg.str());
                 throw maf::Exception(msg.str());
@@ -44,6 +45,7 @@ namespace maf {
             this->_passed = (expected.size() == actual.size());
             if (!this->_passed) {
                 std::ostringstream msg;
+                msg << this->type_name() << " ... "; 
                 msg << prefix << "expected.size() (" << expected.size() << ") != actual.size() (" << actual.size() << ")";
                 maf::warning(msg.str());
                 throw maf::Exception(msg.str());
@@ -59,6 +61,7 @@ namespace maf {
 
             if (!this->_passed) {
                 std::ostringstream msg;
+                msg << this->type_name() << " ... "; 
                 msg << prefix << "expected != actual" << std::endl;
                 std::string vec_name = "expected: ";
 
@@ -90,6 +93,7 @@ namespace maf {
 
             if (!this->_passed) {
                 std::ostringstream msg;
+                msg << this->type_name() << " ... "; 
                 msg << prefix << "expected (" << expected << ") == actual (" << actual << ")";
                 maf::warning(msg.str());
                 throw maf::Exception(msg.str());
@@ -112,6 +116,7 @@ namespace maf {
 
             if (!this->_passed) {
                 std::ostringstream msg;
+                msg << this->type_name() << " ... "; 
                 msg << prefix << "expected == actual" << std::endl;
                 std::string vec_name = "expected: ";
 
@@ -146,6 +151,7 @@ namespace maf {
 
             if (!this->_passed) {
                 std::ostringstream msg;
+                msg << this->type_name() << " ... "; 
                 msg << prefix << "(actual - expected) / expected > relative\n"
                     << "( (" << actual << ") - (" << expected << ") ) / (" << expected << ") = ("
                     << error << ") > " << relative;
@@ -159,6 +165,7 @@ namespace maf {
             this->_passed = (expected.size() == actual.size());
             if (!this->_passed) {
                 std::ostringstream msg;
+                msg << this->type_name() << " ... "; 
                 msg << prefix << "expected.size() (" << expected.size() << ") != actual.size() (" << actual.size() << ")";
                 maf::warning(msg.str());
                 throw maf::Exception(msg.str());
@@ -174,6 +181,7 @@ namespace maf {
 
             if (!this->_passed) {
                 std::ostringstream msg;
+                msg << this->type_name() << " ... "; 
                 msg << prefix << "expected != actual" << std::endl;
                 std::string vec_name = "expected: ";
 
@@ -202,6 +210,7 @@ namespace maf {
 
             if (!this->_passed) {
                 std::ostringstream msg;
+                msg << this->type_name() << " ... "; 
                 msg << prefix << "(actual - expected) / expected > relative\n"
                     << "( (" << actual << ") - (" << expected << ") ) / (" << expected << ") = ("
                     << error << ") <= " << relative;
