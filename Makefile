@@ -50,18 +50,18 @@ define _mkdirs
 endef
 mkdirs=$(call _mkdirs,$(@D)/)
 
-SRC = $(filter-out %_wrap%,$(call rwildcard, $(SRC_DIR), *.cpp)) $(SRC_DIR)/Version.cpp
-HEADERS = $(filter-out %maf_wrap.hpp maf/maf.hpp, $(call rwildcard, $(SRC_DIR), *.hpp))
+SRC = $(filter-out %_wrap.cpp,$(call rwildcard, $(SRC_DIR), *.cpp)) $(SRC_DIR)/Version.cpp
+HEADERS = $(filter-out %_wrap.hpp maf/maf.hpp, $(call rwildcard, $(SRC_DIR), *.hpp))
 DIRECTORIES = $(sort $(dir $(SRC) $(HEADERS)))
-OBJ = $(patsubst %.cpp,$(OBJ_DIR)/%.obj,$(SRC))
+OBJ = $(filter-out %_wrap.obj,$(patsubst %.cpp,$(OBJ_DIR)/%.obj,$(SRC)))
 
 .PHONY: test test_py test_cpp
 
 all: release
 
-release: test
+release: test examples
 
-debug: test
+debug: test examples
 
 clean:
 	-$(RM) -r ./debug/ ./release/
@@ -86,36 +86,52 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 	@echo '}' >> $@
 	@echo "" >> $@
 
-test: test_cpp test_py
-
-test_py: PY_TEST_FILES=$(sort $(call rwildcard, tests examples, *.py))
-test_py: $(PY_EXT)
-	$(foreach pytestfile, $(PY_TEST_FILES), $(call colorecho,PYTHONPATH=$(BIN_DIR) mpiexec -n 2 python $(pytestfile)))
-
 $(LIBMAF): $(OBJ)
 	$(mkdirs)
 	$(call colorecho,$(LDSTATIC) $^)
 
-$(PY_EXT): $(LIBMAF) $(OBJ_DIR)/maf/maf_wrap.obj
-	@# $< is repeated (implicit in $^) because the symbols are only needed after maf_wrap.obj
+$(OBJ_DIR)/%.obj: %.cpp %.hpp
 	$(mkdirs)
-	$(call colorecho,$(LDSHARED) $^ $<)
+	$(call colorecho,$(CXX) $(CXXFLAGS) -I.)
 
-test_cpp: $(sort $(patsubst %.cpp, $(BIN_DIR)/%.exe, $(call rwildcard, tests examples, *.cpp)))
+test: test_cpp test_py
+
+examples: cpp_examples py_examples
+
+# cpp targets
+cpp: test_cpp cpp_examples
+
+test_cpp: $(sort $(patsubst %.cpp, $(BIN_DIR)/%.exe, $(call rwildcard, tests, *.cpp)))
+	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 3 $(cpp_test_exec)))
+
+cpp_examples: $(sort $(patsubst %.cpp, $(BIN_DIR)/%.exe, $(call rwildcard, examples, *.cpp)))
 	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 3 $(cpp_test_exec)))
 
 $(BIN_DIR)/%.exe: maf/maf.hpp $(OBJ_DIR)/%.obj $(LIBMAF)
 	$(mkdirs)
 	$(call colorecho,$(LDEXE) $(filter-out maf/maf.hpp,$^))
 
+$(OBJ_DIR)/%.obj: %.cpp
+	$(mkdirs)
+	$(call colorecho,$(CXX) $(CXXFLAGS) -I.)
+
+# Python targets
+py: test_py py_examples
+
+test_py: PY_TEST_FILES=$(sort $(call rwildcard, tests, *.py))
+test_py: $(PY_EXT)
+	$(foreach pytestfile, $(PY_TEST_FILES), $(call colorecho,PYTHONPATH=$(BIN_DIR) mpiexec -n 2 python $(pytestfile)))
+
+py_examples: PY_EXAMPLE_FILES=$(sort $(call rwildcard, examples, *.py))
+py_examples: $(PY_EXT)
+	$(foreach pytestfile, $(PY_EXAMPLE_FILES), $(call colorecho,PYTHONPATH=$(BIN_DIR) mpiexec -n 2 python $(pytestfile)))
+
+$(PY_EXT): $(LIBMAF) $(OBJ_DIR)/maf/maf_wrap.obj
+	@# $< is repeated (implicit in $^) because the symbols are only needed after maf_wrap.obj
+	$(mkdirs)
+	$(call colorecho,$(LDSHARED) $^ $<)
+
 $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: maf.i maf/maf.hpp
 	$(mkdirs)
 	$(call colorecho,swig -python -builtin -includeall -ignoremissing -c++ -outdir $(BIN_DIR) -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i)
 
-$(OBJ_DIR)/%.obj: %.cpp %.hpp
-	$(mkdirs)
-	$(call colorecho,$(CXX) $(CXXFLAGS) -I.)
-
-$(OBJ_DIR)/%.obj: %.cpp
-	$(mkdirs)
-	$(call colorecho,$(CXX) $(CXXFLAGS) -I.)

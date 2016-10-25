@@ -125,23 +125,4 @@ MAF_TEST_ACTION(test_bcast_double_vector) {
     }
 };
 
-int main(int argc, char* argv[]) {
-    int exit_code = -1;
-
-    try {
-        auto controller = maf::TestController();
-        controller.start();
-        exit_code = 0;
-    }
-    catch (std::exception& ex) {
-        maf::log("FAILED: &", ex.what());
-    }
-    catch (...) {
-        maf::log("FAILED: no idea what happened");
-    }
-    if (exit_code != 0) {
-        MPI_Abort(MPI_COMM_WORLD, -1);
-    }
-
-    return exit_code;
-}
+MAF_TEST_MAIN()

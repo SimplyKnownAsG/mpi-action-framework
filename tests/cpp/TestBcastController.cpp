@@ -7,22 +7,16 @@ public:
     int count = 0;
 };
 
-class IncrementContextAction : public maf::Action {
+MAF_ACTION(IncrementContextAction) {
 
-public:
-
-    void run() {
+    void run() override {
         this->context->as<CounterContext>()->count += 1;
     };
-
-    std::string type_name() {
-        return "IncrementContextAction";
-    }
 
 };
 
 MAF_TEST_ACTION(test_bcast_action) {
-    void run() {
+    void run() override {
         auto action = std::shared_ptr<Action>(new IncrementContextAction);
         auto controller = maf::BcastController();
         auto context = std::shared_ptr<maf::Context>(new CounterContext);
@@ -45,11 +39,16 @@ MAF_TEST_ACTION(test_bcast_action_vector) {
         controller.context = context;
 
         if (controller.rank == 0) {
+            // empty list doesn't increment
             controller.bcast(actions);
             this->assert_equal(0, context->as<CounterContext>()->count);
+            
+            // increment by 3
             actions.insert(actions.begin(), 3, action);
             controller.bcast(actions);
             this->assert_equal(3, context->as<CounterContext>()->count);
+
+            // increment by 4
             actions.push_back(action);
             controller.bcast(actions);
             controller.start(); // this terminates workers
@@ -62,29 +61,4 @@ MAF_TEST_ACTION(test_bcast_action_vector) {
     }
 };
 
-
-int main(int argc, char* argv[]) {
-    int exit_code = -1;
-
-    auto factory = std::shared_ptr<maf::ActionFactory>((maf::ActionFactory*)(new maf::TActionFactory<IncrementContextAction>("IncrementContextAction")));
-    maf::ActionFactory::Register(factory);
-
-    try {
-        auto controller = maf::TestController();
-        controller.start();
-        exit_code = 0;
-    }
-    catch (std::exception& ex) {
-        maf::log("FAILED: &", ex.what());
-    }
-    catch (...) {
-        maf::log("FAILED: no idea what happened");
-    }
-
-    if (exit_code == -1) {
-        MPI_Abort(MPI_COMM_WORLD, -1);
-    }
-
-    MPI_Finalize();
-    return exit_code;
-}
+MAF_TEST_MAIN()
