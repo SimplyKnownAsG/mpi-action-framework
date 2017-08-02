@@ -9,8 +9,8 @@ BIN_DIR=$(BUILD_DIR)/bin
 include MakefileFunctions.in
 ifeq ($(OS),Windows_NT)
 	CXX=cl
-	CXXFLAGS= /nologo /EHa /fp:strict /MP "/IC:\Program Files\Microsoft HPC Pack 2012\Inc" "/IC:\tools\Python27\include" /I. /c $< /Fo:$@
-	LDFLAGS= /nologo /incremental:no '/libpath:C:\tools\Python27\libs' '/libpath:C:\Program Files\Microsoft HPC Pack 2012\Lib\amd64' msmpi.lib
+	CXXFLAGS= /nologo /EHa /fp:strict /MP "/IC:\Program Files\Microsoft MPI\Inc" "/IC:\tools\Python27\include" /I. /c $< /Fo:$@
+	LDFLAGS= /nologo /incremental:no '/libpath:C:\tools\Python27\libs' '/libpath:C:\Program Files\Microsoft MPI\Lib\amd64' msmpi.lib
 	LDSHARED=link $(LDFLAGS) /DLL /out:$@
 	LDSTATIC=lib $(LDFLAGS) /out:$@
 	LDEXE=link $(LDFLAGS) /out:$@

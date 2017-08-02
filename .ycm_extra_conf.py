@@ -1,8 +1,13 @@
 
 import subprocess
+import sys
 
+if 'win' in sys.platform:
+    CXXFLAGS = [r'-IC:/Program Files/Microsoft MPI/Inc']
 
-CXXFLAGS = subprocess.check_output('mpic++ --showme', shell=True).strip().split()
+else:
+    CXXFLAGS = subprocess.check_output('mpic++ --showme', shell=True).strip().split()
+
 CXXFLAGS += ['-I.']
 
 FLAGS = {
