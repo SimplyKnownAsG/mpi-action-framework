@@ -1,21 +1,23 @@
 #include "mpi.h"
 
-#include "maf/controllers/BcastController.hpp"
-#include "maf/controllers/ScatterController.hpp"
 #include "maf/actions/ActionFactory.hpp"
+#include "maf/actions/EndLoopAction.hpp"
 #include "maf/communication/ReadArchive.hpp"
 #include "maf/communication/WriteArchive.hpp"
-#include "maf/actions/EndLoopAction.hpp"
+#include "maf/controllers/BcastController.hpp"
+#include "maf/controllers/ScatterController.hpp"
 
 #include "maf/Log.hpp"
 
 namespace maf {
 
-    BcastController::BcastController() : Controller() {
+    BcastController::BcastController()
+      : Controller() {
         // empty;
     }
 
-    BcastController::BcastController(std::vector<std::shared_ptr<Action>> actions) : Controller(actions) {
+    BcastController::BcastController(std::vector<std::shared_ptr<Action>> actions)
+      : Controller(actions) {
         // empty;
     }
 
@@ -43,7 +45,7 @@ namespace maf {
             std::shared_ptr<Archive> archive = std::shared_ptr<Archive>(new ReadArchive(data));
             action = ActionFactory::Create(archive);
         }
-        
+
         action->start(this->context);
     }
 
@@ -53,7 +55,8 @@ namespace maf {
     }
 
     void BcastController::scatter(std::vector<std::shared_ptr<Action>> actions) {
-        std::shared_ptr<Action> controller = std::shared_ptr<Action>(new ScatterController(actions));
+        std::shared_ptr<Action> controller =
+          std::shared_ptr<Action>(new ScatterController(actions));
         this->bcast(controller);
     }
 
@@ -73,5 +76,4 @@ namespace maf {
         auto end_act = std::shared_ptr<Action>(new EndLoopAction(throw_exception));
         this->bcast(end_act);
     }
-
 }

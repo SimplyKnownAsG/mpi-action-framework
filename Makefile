@@ -1,4 +1,12 @@
 
+PROJECT:=maf
+
+SRC_DIR=$(PROJECT)
+OBJ_DIR=$(BUILD_DIR)
+BIN_DIR=$(BUILD_DIR)/bin
+
+
+include MakefileFunctions.in
 ifeq ($(OS),Windows_NT)
 	CXX=cl
 	CXXFLAGS= /nologo /EHa /fp:strict /MP "/IC:\Program Files\Microsoft HPC Pack 2012\Inc" "/IC:\tools\Python27\include" /I. /c $< /Fo:$@
@@ -6,7 +14,7 @@ ifeq ($(OS),Windows_NT)
 	LDSHARED=link $(LDFLAGS) /DLL /out:$@
 	LDSTATIC=lib $(LDFLAGS) /out:$@
 	LDEXE=link $(LDFLAGS) /out:$@
-	LIBMAF=$(BUILD_DIR)/lib/libmaf.lib
+	LIB$(PROJECT)=$(BUILD_DIR)/lib/libmaf.lib
 	PY_EXT=$(BIN_DIR)/_maf.pyd
 else
 	CXX=mpic++
@@ -16,7 +24,7 @@ else
 	LDSHARED=mpic++ -Wall -shared -o $@
 	LDSTATIC=ar crs $@
 	LDEXE=mpic++ -Wall -o $@
-	LIBMAF=$(BUILD_DIR)/lib/libmaf.a
+	LIB$(PROJECT)=$(BUILD_DIR)/lib/libmaf.a
 	PY_EXT=$(BIN_DIR)/_maf.so
 endif
 
@@ -29,35 +37,22 @@ else
 	BUILD_DIR=release
 endif
 
-# for standard CXX settings
-SRC_DIR=maf
-OBJ_DIR=$(BUILD_DIR)/obj
-BIN_DIR=$(BUILD_DIR)/bin
-
-# functions
-rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
-define colorecho
-	@tput setaf 4
-	@echo $1
-	@tput sgr0
-	@$1
-
-endef
-define _mkdirs
-	$(if $(subst ./,,$(dir $1)),$(call _mkdirs,$(dir $(patsubst %/,%,$(dir $1)))))
-	@if [ ! -d $1 ]; then mkdir $1 ; fi
-
-endef
-mkdirs=$(call _mkdirs,$(@D)/)
 
 SRC = $(filter-out %_wrap.cpp,$(call rwildcard, $(SRC_DIR), *.cpp)) $(SRC_DIR)/Version.cpp
 HEADERS = $(filter-out %_wrap.hpp maf/maf.hpp, $(call rwildcard, $(SRC_DIR), *.hpp))
 DIRECTORIES = $(sort $(dir $(SRC) $(HEADERS)))
 OBJ = $(filter-out %_wrap.obj,$(patsubst %.cpp,$(OBJ_DIR)/%.obj,$(SRC)))
 
+CPP_TEST_EXEC := $(sort $(patsubst %.cpp, $(BIN_DIR)/%.exe, $(call rwildcard, tests examples, *.cpp)))
+CPP_TEST_OBJ := $(patsubst $(BIN_DIR)/%.exe,$(OBJ_DIR)/%.obj,$(CPP_TEST_EXEC))
+
 .PHONY: test test_py test_cpp
 
 all: release
+
+# this must be placed after your .DEFAULT_GOAL, or you can manually state what it is
+# https://www.gnu.org/software/make/manual/html_node/Special-Variables.html
+$(call create_dirs,$(OBJ) $(LIB$(PROJECT)) $(CPP_TEST_EXEC) $(CPP_TEST_OBJ))
 
 release: test examples
 
@@ -86,12 +81,10 @@ maf/Version.cpp: $(filter-out %wrap.hpp %wrap.cpp %Version.cpp,$(HEADERS) $(SRC)
 	@echo '}' >> $@
 	@echo "" >> $@
 
-$(LIBMAF): $(OBJ)
-	$(mkdirs)
+$(LIB$(PROJECT)): $(OBJ)
 	$(call colorecho,$(LDSTATIC) $^)
 
-$(OBJ_DIR)/%.obj: %.cpp %.hpp
-	$(mkdirs)
+$(OBJ_DIR)/%.obj: %.cpp %.hpp | $(TARGET_DIRS)
 	$(call colorecho,$(CXX) $(CXXFLAGS) -I.)
 
 test: test_cpp test_py
@@ -101,18 +94,16 @@ examples: cpp_examples py_examples
 # cpp targets
 cpp: test_cpp cpp_examples
 
-test_cpp: $(sort $(patsubst %.cpp, $(BIN_DIR)/%.exe, $(call rwildcard, tests, *.cpp)))
+test_cpp: $(sort $(patsubst %.cpp, $(BIN_DIR)/%.exe, $(call rwildcard, tests, *.cpp))) | $(TARGET_DIRS)
 	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 3 $(cpp_test_exec)))
 
-cpp_examples: $(sort $(patsubst %.cpp, $(BIN_DIR)/%.exe, $(call rwildcard, examples, *.cpp)))
+cpp_examples: $(sort $(patsubst %.cpp, $(BIN_DIR)/%.exe, $(call rwildcard, examples, *.cpp))) | $(TARGET_DIRS)
 	$(foreach cpp_test_exec, $^, $(call colorecho,mpiexec -n 3 $(cpp_test_exec)))
 
-$(BIN_DIR)/%.exe: maf/maf.hpp $(OBJ_DIR)/%.obj $(LIBMAF)
-	$(mkdirs)
+$(BIN_DIR)/%.exe: maf/maf.hpp $(OBJ_DIR)/%.obj $(LIB$(PROJECT)) | $(TARGET_DIRS)
 	$(call colorecho,$(LDEXE) $(filter-out maf/maf.hpp,$^))
 
-$(OBJ_DIR)/%.obj: %.cpp
-	$(mkdirs)
+$(OBJ_DIR)/%.obj: %.cpp | $(TARGET_DIRS)
 	$(call colorecho,$(CXX) $(CXXFLAGS) -I.)
 
 # Python targets
@@ -126,12 +117,10 @@ py_examples: PY_EXAMPLE_FILES=$(sort $(call rwildcard, examples, *.py))
 py_examples: $(PY_EXT)
 	$(foreach pytestfile, $(PY_EXAMPLE_FILES), $(call colorecho,PYTHONPATH=$(BIN_DIR) mpiexec -n 2 python $(pytestfile)))
 
-$(PY_EXT): $(LIBMAF) $(OBJ_DIR)/maf/maf_wrap.obj
+$(PY_EXT): $(LIB$(PROJECT)) $(OBJ_DIR)/maf/maf_wrap.obj | $(TARGET_DIRS)
 	@# $< is repeated (implicit in $^) because the symbols are only needed after maf_wrap.obj
-	$(mkdirs)
 	$(call colorecho,$(LDSHARED) $^ $<)
 
 $(SRC_DIR)/maf_wrap.cpp $(SRC_DIR)/maf_wrap.hpp: maf.i maf/maf.hpp
-	$(mkdirs)
 	$(call colorecho,swig -python -builtin -includeall -ignoremissing -c++ -outdir $(BIN_DIR) -o $(SRC_DIR)/maf_wrap.cpp -oh $(SRC_DIR)/maf_wrap.hpp maf.i)
 
