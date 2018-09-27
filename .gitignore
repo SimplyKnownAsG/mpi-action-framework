@@ -27,6 +27,7 @@ maf/Version.cpp
 .Python
 env/
 build/
+debug/
 develop-eggs/
 dist/
 downloads/

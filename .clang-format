@@ -1,12 +1,13 @@
-BasedOnStyle: Mozilla 
+BasedOnStyle: Mozilla
 
 UseTab: Never
 AccessModifierOffset: -4
 IndentWidth: 4
+ContinuationIndentWidth: 8
 
 BreakBeforeBraces: Attach
-AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: None
 
 IndentCaseLabels: false
 NamespaceIndentation: All

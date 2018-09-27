@@ -1,18 +1,19 @@
 #pragma once
 
-#include "maf/communication/Transmittable.hpp"
 #include "maf/Context.hpp"
+#include "maf/communication/Transmittable.hpp"
 
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 namespace maf {
 
-    class Action : public virtual _Transmittable, public std::enable_shared_from_this<Action> {
+    class Action
+      : public virtual _Transmittable
+      , public std::enable_shared_from_this<Action> {
 
     public:
-
         std::shared_ptr<Context> context;
 
         Action();
@@ -27,5 +28,4 @@ namespace maf {
 
         virtual void tear_down();
     };
-
 }
